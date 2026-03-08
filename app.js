@@ -119,6 +119,7 @@
   }
 
   const elements = {
+    appShell: document.getElementById("appShell"),
     heroStats: document.getElementById("heroStats"),
     examStats: document.getElementById("examStats"),
     reviewStats: document.getElementById("reviewStats"),
@@ -247,7 +248,7 @@
     timerRemaining: 0,
     timerIntervalId: null,
     completionReason: "",
-    navTarget: "homeSection",
+    navTarget: "homeScreen",
     sectionCategory: "all",
     readerSectionId: persisted.readerState.sectionId || "all",
     readerQuery: persisted.readerState.query || "",
@@ -1403,11 +1404,158 @@
     }
   };
 
-  const setActiveNav = (targetId) => {
-    state.navTarget = targetId;
-    elements.bottomNav.querySelectorAll("[data-nav-target]").forEach((button) => {
-      button.classList.toggle("is-active", button.dataset.navTarget === targetId);
+  const createScreenHeaderMarkup = (eyebrow, title, description) => `
+    <header class="screen-head">
+      <p class="eyebrow">${eyebrow}</p>
+      <h2>${title}</h2>
+      <p>${description}</p>
+    </header>
+  `;
+
+  const initializeAppScreens = () => {
+    if (!elements.appShell || document.getElementById("homeScreen")) {
+      return;
+    }
+
+    const hero = elements.appShell.querySelector(".hero");
+    const toolbar = elements.appShell.querySelector(".toolbar");
+    const sectionBrowser = elements.appShell.querySelector(".section-browser");
+    const featureGrid = elements.appShell.querySelector(".feature-grid");
+    const knowledgeTools = elements.appShell.querySelector(".knowledge-tools");
+    const examSection = document.getElementById("examSection");
+    const reviewSection = document.getElementById("reviewSection");
+
+    const homeScreen = document.createElement("section");
+    homeScreen.className = "app-screen is-active";
+    homeScreen.id = "homeScreen";
+    if (hero) {
+      homeScreen.appendChild(hero);
+    }
+    homeScreen.insertAdjacentHTML(
+      "beforeend",
+      `
+        <section class="feature-grid home-grid">
+          <article class="feature-card home-shortcuts">
+            <div>
+              <p class="eyebrow">Hizli Gecis</p>
+              <h2>Uygulama Ekranlari</h2>
+              <p>Alt sekmelerdeki alanlar burada da kisayol olarak sunulur. Mobilde tek dokunusla istedigin ekrana gecersin.</p>
+            </div>
+            <div class="shortcut-grid">
+              <button class="shortcut-card" data-open-screen="sectionsScreen" type="button">
+                <span class="shortcut-card__label">Bolumler</span>
+                <strong>Konu katmanlarini ac</strong>
+              </button>
+              <button class="shortcut-card" data-open-screen="bookScreen" type="button">
+                <span class="shortcut-card__label">Kitap</span>
+                <strong>Okuyucu ekranina gec</strong>
+              </button>
+              <button class="shortcut-card" data-open-screen="examScreen" type="button">
+                <span class="shortcut-card__label">Deneme</span>
+                <strong>Sureli deneme baslat</strong>
+              </button>
+              <button class="shortcut-card" data-open-screen="reviewScreen" type="button">
+                <span class="shortcut-card__label">Tekrar</span>
+                <strong>Yanlis odakli calis</strong>
+              </button>
+            </div>
+          </article>
+        </section>
+      `,
+    );
+
+    const sectionsScreen = document.createElement("section");
+    sectionsScreen.className = "app-screen";
+    sectionsScreen.id = "sectionsScreen";
+    sectionsScreen.insertAdjacentHTML(
+      "beforeend",
+      createScreenHeaderMarkup(
+        "Bolumler",
+        "Konu Katmanlari",
+        "Bolumler ayri bir mobil ekranda sunulur. Kategoriler arasinda gezip kartlari yatay serit halinde acabilirsin.",
+      ),
+    );
+    if (toolbar) {
+      sectionsScreen.appendChild(toolbar);
+    }
+    if (sectionBrowser) {
+      sectionsScreen.appendChild(sectionBrowser);
+    }
+
+    const bookScreen = document.createElement("section");
+    bookScreen.className = "app-screen";
+    bookScreen.id = "bookScreen";
+    bookScreen.insertAdjacentHTML(
+      "beforeend",
+      createScreenHeaderMarkup(
+        "Kitap",
+        "Mustakil Okuma Alani",
+        "Kitap okuyucu bu ekranda tek basina yer alir. Arama ve kitaba soru sorma araclari da ayni ekranda bulunur.",
+      ),
+    );
+    if (elements.readerSection) {
+      bookScreen.appendChild(elements.readerSection);
+    }
+    if (knowledgeTools) {
+      knowledgeTools.classList.add("book-tools");
+      bookScreen.appendChild(knowledgeTools);
+    }
+
+    const examScreen = document.createElement("section");
+    examScreen.className = "app-screen";
+    examScreen.id = "examScreen";
+    examScreen.insertAdjacentHTML(
+      "beforeend",
+      createScreenHeaderMarkup(
+        "Deneme",
+        "Sureli Deneme Ekrani",
+        "Deneme bolumu ayri bir ekran olarak acilir. Sureli oturumlari burada baslatirsin.",
+      ),
+    );
+    if (examSection) {
+      examScreen.appendChild(examSection);
+    }
+
+    const reviewScreen = document.createElement("section");
+    reviewScreen.className = "app-screen";
+    reviewScreen.id = "reviewScreen";
+    reviewScreen.insertAdjacentHTML(
+      "beforeend",
+      createScreenHeaderMarkup(
+        "Tekrar",
+        "Yanlis Odakli Tekrar",
+        "Tekrar bolumu ayri ekrandadir. Yanlislar ve zayif alanlar icin dogrudan buraya gecersin.",
+      ),
+    );
+    if (reviewSection) {
+      reviewScreen.appendChild(reviewSection);
+    }
+
+    featureGrid?.remove();
+    elements.appShell.replaceChildren(homeScreen, sectionsScreen, bookScreen, examScreen, reviewScreen);
+
+    elements.appShell.querySelectorAll("[data-open-screen]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setActiveNav(button.dataset.openScreen);
+      });
     });
+  };
+
+  const setActiveNav = (targetId) => {
+    const nextTarget = document.getElementById(targetId) ? targetId : "homeScreen";
+    state.navTarget = nextTarget;
+    document.querySelectorAll(".app-screen").forEach((screen) => {
+      screen.classList.toggle("is-active", screen.id === nextTarget);
+    });
+    elements.bottomNav.querySelectorAll("[data-nav-target]").forEach((button) => {
+      const isActive = button.dataset.navTarget === nextTarget;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+    if (window.location.hash !== `#${nextTarget}`) {
+      window.history.replaceState(null, "", `#${nextTarget}`);
+    }
+    window.scrollTo(0, 0);
   };
 
   const renderHeroStats = () => {
@@ -1696,11 +1844,7 @@
     }
 
     renderBookReader();
-    setActiveNav("readerSection");
-
-    if (scroll) {
-      elements.readerSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    setActiveNav("bookScreen");
   };
 
   const renderReaderMeta = (visiblePages, currentPage, currentIndex) => {
@@ -1887,11 +2031,7 @@
     }
 
     renderBookReader();
-    setActiveNav("readerSection");
-
-    if (scroll) {
-      elements.readerSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    setActiveNav("bookScreen");
   };
 
   const renderBookSearchResults = () => {
@@ -2648,30 +2788,7 @@
   };
 
   const observeNavigationTargets = () => {
-    if (!("IntersectionObserver" in window)) {
-      return;
-    }
-
-    const targets = ["homeSection", "readerSection", "examSection", "reviewSection"]
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
-        if (visible) {
-          setActiveNav(visible.target.id);
-        }
-      },
-      {
-        rootMargin: "-35% 0px -45% 0px",
-        threshold: [0.2, 0.35, 0.55],
-      },
-    );
-
-    targets.forEach((target) => observer.observe(target));
+    return;
   };
 
   elements.searchInput.addEventListener("input", (event) => {
@@ -2744,7 +2861,7 @@
         return;
       }
     }
-    if (state.navTarget !== "readerSection") {
+    if (state.navTarget !== "bookScreen") {
       return;
     }
 
@@ -2854,12 +2971,7 @@
 
   elements.bottomNav.querySelectorAll("[data-nav-target]").forEach((button) => {
     button.addEventListener("click", () => {
-      const target = document.getElementById(button.dataset.navTarget);
-      if (!target) {
-        return;
-      }
       setActiveNav(button.dataset.navTarget);
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 
@@ -2913,6 +3025,7 @@
     });
   });
 
+  initializeAppScreens();
   renderHeroStats();
   renderFeatureStats();
   state.readerPageId = getReaderStartPageId();
@@ -2920,7 +3033,7 @@
   renderBookSearchResults();
   clearQaAnswer();
   renderSections();
-  setActiveNav("homeSection");
+  setActiveNav((window.location.hash || "").replace("#", "") || "homeScreen");
   observeNavigationTargets();
   registerPwa();
 })();

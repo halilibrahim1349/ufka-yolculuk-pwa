@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-shell" id="homeSection">
+    <main class="app-shell" id="appShell">
       <header class="hero">
         <p class="eyebrow">HTML tabanlı mobil çalışma ekranı</p>
         <h1>Ufka Yolculuk Sınav Hazırlık</h1>
@@ -292,10 +292,11 @@
     </main>
 
     <nav class="bottom-nav" id="bottomNav" aria-label="Alt gezinme">
-      <button class="bottom-nav__item is-active" data-nav-target="homeSection" type="button">Konular</button>
-      <button class="bottom-nav__item" data-nav-target="readerSection" type="button">Kitap</button>
-      <button class="bottom-nav__item" data-nav-target="examSection" type="button">Deneme</button>
-      <button class="bottom-nav__item" data-nav-target="reviewSection" type="button">Tekrar</button>
+      <button class="bottom-nav__item is-active" data-nav-target="homeScreen" type="button">Ana</button>
+      <button class="bottom-nav__item" data-nav-target="sectionsScreen" type="button">Bolum</button>
+      <button class="bottom-nav__item" data-nav-target="bookScreen" type="button">Kitap</button>
+      <button class="bottom-nav__item" data-nav-target="examScreen" type="button">Deneme</button>
+      <button class="bottom-nav__item" data-nav-target="reviewScreen" type="button">Tekrar</button>
     </nav>
 
     <section class="study-overlay hidden" id="studyOverlay" aria-hidden="true">

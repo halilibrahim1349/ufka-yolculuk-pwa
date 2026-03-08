@@ -77,6 +77,75 @@ textarea:focus-visible {
   padding: 22px 0 116px;
 }
 
+.app-screen {
+  display: none;
+  gap: 18px;
+  min-height: calc(100svh - 148px);
+  align-content: start;
+}
+
+.app-screen.is-active {
+  display: grid;
+  animation: rise 220ms ease;
+}
+
+.screen-head {
+  display: grid;
+  gap: 10px;
+  padding: 4px 2px 0;
+}
+
+.screen-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+}
+
+.screen-head p:last-child {
+  margin: 0;
+  max-width: 64ch;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.home-grid {
+  margin-top: 20px;
+}
+
+.home-shortcuts {
+  gap: 16px;
+}
+
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shortcut-card {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(15, 92, 92, 0.1);
+  box-shadow: var(--shadow-soft);
+}
+
+.shortcut-card__label {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.shortcut-card strong {
+  color: var(--ink);
+  line-height: 1.4;
+}
+
 .hero {
   position: relative;
   overflow: hidden;
@@ -259,6 +328,10 @@ textarea:focus-visible {
 
 .knowledge-card {
   align-content: start;
+}
+
+.book-tools {
+  margin-top: 4px;
 }
 
 .book-search-results,
@@ -568,11 +641,11 @@ textarea:focus-visible {
   bottom: var(--safe-bottom);
   transform: translateX(-50%);
   z-index: 9;
-  width: min(520px, calc(100% - 18px));
+  width: min(680px, calc(100% - 18px));
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  padding: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
   border-radius: 24px;
   background: rgba(255, 250, 243, 0.88);
   border: 1px solid rgba(15, 92, 92, 0.12);
@@ -581,11 +654,14 @@ textarea:focus-visible {
 }
 
 .bottom-nav__item {
+  display: grid;
+  place-items: center;
   font-weight: 700;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.1;
 }
 
 .bottom-nav__item.is-active {
@@ -1466,6 +1542,11 @@ textarea:focus-visible {
     padding-bottom: 108px;
   }
 
+  .app-screen {
+    gap: 16px;
+    min-height: calc(100svh - 140px);
+  }
+
   .feature-grid,
   .knowledge-tools,
   .section-grid {
@@ -1554,6 +1635,19 @@ textarea:focus-visible {
     padding-bottom: calc(92px + env(safe-area-inset-bottom));
   }
 
+  .app-screen {
+    gap: 14px;
+    min-height: calc(100svh - 118px);
+  }
+
+  .screen-head {
+    padding: 2px 2px 0;
+  }
+
+  .screen-head h2 {
+    font-size: clamp(1.5rem, 8vw, 2rem);
+  }
+
   .hero,
   .study-panel,
   .question-card,
@@ -1590,6 +1684,10 @@ textarea:focus-visible {
   .feature-card,
   .section-card {
     padding: 16px;
+  }
+
+  .shortcut-grid {
+    grid-template-columns: 1fr;
   }
 
   .section-browser {
@@ -1656,13 +1754,13 @@ textarea:focus-visible {
     gap: 4px;
     padding: 4px;
     border-radius: 18px;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .bottom-nav__item {
     min-height: 50px;
     padding: 8px 4px;
-    font-size: 0.72rem;
+    font-size: 0.63rem;
     line-height: 1.05;
     white-space: normal;
     text-overflow: clip;
