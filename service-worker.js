@@ -1,4 +1,4 @@
-const CACHE_NAME = "ufka-yolculuk-pwa-v17";
+const CACHE_NAME = "ufka-yolculuk-pwa-v18";
 const APP_SHELL = [
   "./",
   "./index.html",

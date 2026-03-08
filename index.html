@@ -177,11 +177,8 @@
           <div class="reader-section__intro">
             <div>
               <p class="eyebrow">Kitap Okuyucu</p>
-              <h2>Tam Metni Uygulama Icinde Oku</h2>
-              <p>
-                Kitabin tum OCR metni uygulama icinde. Bolum sec, temayi ayarla, yazi buyuklugunu degistir ve ayni
-                ekranda profesyonel okuma akisiyla devam et.
-              </p>
+              <h2>Sade Okuma Ekrani</h2>
+              <p>Bolum sec, sayfalar arasinda gec ve metni temiz bir ekranda oku.</p>
             </div>
             <div class="feature-actions">
               <button class="primary-button" id="openReaderButton" type="button">Okumaya Gec</button>
@@ -207,62 +204,58 @@
             </div>
           </div>
 
-          <div class="reader-appearance">
-            <div class="reader-appearance__group">
-              <span class="reader-appearance__label">Tema</span>
-              <div class="reader-toggle-group" id="readerThemeControls">
-                <button class="reader-toggle is-active" data-reader-theme="paper" type="button">Kagit</button>
-                <button class="reader-toggle" data-reader-theme="sepia" type="button">Sepya</button>
-                <button class="reader-toggle" data-reader-theme="night" type="button">Gece</button>
-              </div>
-            </div>
-            <div class="reader-appearance__group">
-              <span class="reader-appearance__label">Yazi Boyutu</span>
-              <div class="reader-stepper">
-                <button class="reader-stepper__button" id="readerFontDecreaseButton" type="button">A-</button>
-                <strong class="reader-stepper__value" id="readerFontValue">100%</strong>
-                <button class="reader-stepper__button" id="readerFontIncreaseButton" type="button">A+</button>
-              </div>
-            </div>
-            <div class="reader-appearance__group">
-              <span class="reader-appearance__label">Satir Araligi</span>
-              <div class="reader-toggle-group" id="readerDensityControls">
-                <button class="reader-toggle" data-reader-density="compact" type="button">Siki</button>
-                <button class="reader-toggle is-active" data-reader-density="relaxed" type="button">Dengeli</button>
-                <button class="reader-toggle" data-reader-density="airy" type="button">Ferah</button>
-              </div>
-            </div>
-            <div class="reader-appearance__group">
-              <span class="reader-appearance__label">Okuma Modu</span>
-              <div class="reader-toggle-group" id="readerModeControls">
-                <button class="reader-toggle is-active" data-reader-mode="standard" type="button">Standart</button>
-                <button class="reader-toggle" data-reader-mode="focus" type="button">Odak</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="reader-meta" id="readerMeta"></div>
-
-          <div class="reader-layout">
-            <aside class="reader-sidebar">
-              <section class="reader-sidebar__section">
-                <p class="eyebrow">Bolumler</p>
-                <div class="reader-chapter-list" id="readerChapterList"></div>
-              </section>
-
-              <section class="reader-sidebar__section">
-                <div class="reader-nav">
-                  <button class="ghost-button" id="readerPrevButton" type="button">Onceki Sayfa</button>
-                  <button class="ghost-button" id="readerNextButton" type="button">Sonraki Sayfa</button>
+          <details class="reader-drawer">
+            <summary>Okuma Ayarlari</summary>
+            <div class="reader-appearance">
+              <div class="reader-appearance__group">
+                <span class="reader-appearance__label">Tema</span>
+                <div class="reader-toggle-group" id="readerThemeControls">
+                  <button class="reader-toggle is-active" data-reader-theme="paper" type="button">Kagit</button>
+                  <button class="reader-toggle" data-reader-theme="sepia" type="button">Sepya</button>
+                  <button class="reader-toggle" data-reader-theme="night" type="button">Gece</button>
                 </div>
-                <p class="reader-page-status" id="readerPageStatus"></p>
-                <div class="reader-page-strip" id="readerPageStrip"></div>
-              </section>
-            </aside>
+              </div>
+              <div class="reader-appearance__group">
+                <span class="reader-appearance__label">Yazi Boyutu</span>
+                <div class="reader-stepper">
+                  <button class="reader-stepper__button" id="readerFontDecreaseButton" type="button">A-</button>
+                  <strong class="reader-stepper__value" id="readerFontValue">100%</strong>
+                  <button class="reader-stepper__button" id="readerFontIncreaseButton" type="button">A+</button>
+                </div>
+              </div>
+              <div class="reader-appearance__group">
+                <span class="reader-appearance__label">Satir Araligi</span>
+                <div class="reader-toggle-group" id="readerDensityControls">
+                  <button class="reader-toggle" data-reader-density="compact" type="button">Siki</button>
+                  <button class="reader-toggle is-active" data-reader-density="relaxed" type="button">Dengeli</button>
+                  <button class="reader-toggle" data-reader-density="airy" type="button">Ferah</button>
+                </div>
+              </div>
+              <div class="reader-appearance__group">
+                <span class="reader-appearance__label">Okuma Modu</span>
+                <div class="reader-toggle-group" id="readerModeControls">
+                  <button class="reader-toggle is-active" data-reader-mode="standard" type="button">Standart</button>
+                  <button class="reader-toggle" data-reader-mode="focus" type="button">Odak</button>
+                </div>
+              </div>
+            </div>
+          </details>
 
-            <article class="reader-pane">
-              <div class="reader-pane__chrome">
-                <div class="reader-pane__head">
+          <details class="reader-drawer">
+            <summary>Bolum Listesi</summary>
+            <div class="reader-chapter-list" id="readerChapterList"></div>
+          </details>
+
+          <article class="reader-pane reader-pane--solo">
+            <div class="reader-pane__chrome">
+              <div class="reader-pane__topline">
+                <p class="reader-page-status" id="readerPageStatus"></p>
+                <div class="reader-nav">
+                  <button class="ghost-button" id="readerPrevButton" type="button">Onceki</button>
+                  <button class="ghost-button" id="readerNextButton" type="button">Sonraki</button>
+                </div>
+              </div>
+              <div class="reader-pane__head">
                   <div>
                     <p class="eyebrow">Okuma Ekrani</p>
                     <h3 id="readerPageTitle">Kitap sayfasi</h3>
@@ -270,11 +263,13 @@
                   </div>
                   <div class="feature-actions reader-pane__actions" id="readerPageActions"></div>
                 </div>
+                <div class="reader-meta reader-meta--compact" id="readerMeta"></div>
                 <div class="reader-progress">
                   <div class="reader-progress__track">
                     <span class="reader-progress__fill" id="readerProgressFill"></span>
                   </div>
                   <p class="reader-progress__label" id="readerProgressLabel"></p>
+                  <div class="reader-page-strip" id="readerPageStrip"></div>
                   <p class="swipe-hint" id="readerSwipeHint">Sayfalar arasında sağa sola kaydırarak geçebilirsin.</p>
                 </div>
               </div>
@@ -285,7 +280,6 @@
                 <div class="reader-page-footer" id="readerPageFooter"></div>
               </div>
             </article>
-          </div>
         </div>
       </section>
 

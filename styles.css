@@ -334,6 +334,48 @@ textarea:focus-visible {
   margin-top: 4px;
 }
 
+.book-workspace {
+  display: grid;
+  gap: 16px;
+}
+
+.book-view-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 6px;
+  border-radius: 22px;
+  background: rgba(255, 250, 243, 0.78);
+  border: 1px solid rgba(15, 92, 92, 0.08);
+  box-shadow: var(--shadow-soft);
+}
+
+.book-view-button {
+  min-height: 48px;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.book-view-button.is-active {
+  background: var(--accent);
+  color: #f6faf8;
+}
+
+.book-panel {
+  display: none;
+}
+
+.book-panel.is-active {
+  display: grid;
+  gap: 16px;
+}
+
+.book-panel-card {
+  margin: 0;
+}
+
 .book-search-results,
 .source-list {
   display: grid;
@@ -985,9 +1027,9 @@ textarea:focus-visible {
 
 .reader-section__intro,
 .reader-toolbar,
-.reader-layout,
 .reader-nav,
-.reader-pane__head {
+.reader-pane__head,
+.reader-pane__topline {
   display: grid;
   gap: 16px;
 }
@@ -1010,6 +1052,54 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 14px;
+}
+
+.reader-meta--compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reader-meta-pill {
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: var(--reader-panel);
+  border: 1px solid rgba(15, 92, 92, 0.08);
+  box-shadow: var(--shadow-soft);
+}
+
+.reader-meta-pill span {
+  color: var(--reader-muted);
+  font-size: 0.78rem;
+}
+
+.reader-meta-pill strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--reader-ink);
+  font-size: 1rem;
+}
+
+.reader-drawer {
+  border-radius: 20px;
+  background: var(--reader-surface);
+  border: 1px solid rgba(15, 92, 92, 0.08);
+  overflow: clip;
+}
+
+.reader-drawer summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 18px;
+  font-weight: 800;
+  color: var(--reader-ink);
+}
+
+.reader-drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.reader-drawer[open] summary {
+  border-bottom: 1px solid rgba(15, 92, 92, 0.08);
 }
 
 .reader-layout {
@@ -1035,6 +1125,11 @@ textarea:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.reader-pane__topline {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
 .reader-page-status,
 .reader-page-info {
   margin: 0;
@@ -1044,8 +1139,10 @@ textarea:focus-visible {
 
 .reader-page-strip {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .reader-page-chip {
@@ -1074,6 +1171,10 @@ textarea:focus-visible {
   padding: 22px;
   display: grid;
   gap: 18px;
+}
+
+.reader-pane--solo {
+  padding: 18px;
 }
 
 .reader-pane__head {
@@ -1568,7 +1669,6 @@ textarea:focus-visible {
 
   .reader-section__intro,
   .reader-toolbar,
-  .reader-layout,
   .reader-pane__head {
     grid-template-columns: 1fr;
   }
@@ -1577,21 +1677,8 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .reader-sidebar {
-    position: static;
-  }
-
   .reader-pane__chrome {
     position: static;
-  }
-
-  .reader-chapter-list {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(220px, 72vw);
-    max-height: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 4px;
   }
 
   .reader-page-strip {
@@ -1790,6 +1877,26 @@ textarea:focus-visible {
     gap: 12px;
   }
 
+  .book-view-switch {
+    gap: 6px;
+    padding: 4px;
+    border-radius: 18px;
+  }
+
+  .book-view-button {
+    min-height: 44px;
+    font-size: 0.88rem;
+    padding: 8px 6px;
+  }
+
+  .reader-drawer summary {
+    padding: 14px 16px;
+  }
+
+  .reader-pane__topline {
+    grid-template-columns: 1fr;
+  }
+
   .reader-toggle-group,
   .reader-stepper {
     flex-wrap: nowrap;
@@ -1809,24 +1916,10 @@ textarea:focus-visible {
     white-space: nowrap;
   }
 
-  .reader-meta {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .reader-stat-card {
-    padding: 14px;
-  }
-
-  .reader-sidebar {
-    padding: 0;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-  }
-
-  .reader-sidebar__section {
-    padding: 12px;
+  .reader-meta,
+  .reader-meta--compact {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .reader-page-footer {

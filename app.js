@@ -249,6 +249,7 @@
     timerIntervalId: null,
     completionReason: "",
     navTarget: "homeScreen",
+    bookView: "read",
     sectionCategory: "all",
     readerSectionId: persisted.readerState.sectionId || "all",
     readerQuery: persisted.readerState.query || "",
@@ -1412,6 +1413,23 @@
     </header>
   `;
 
+  const setBookView = (viewId = "read") => {
+    const nextView = ["read", "search", "ask"].includes(viewId) ? viewId : "read";
+    state.bookView = nextView;
+
+    document.querySelectorAll("[data-book-view]").forEach((button) => {
+      const isActive = button.dataset.bookView === nextView;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+
+    document.querySelectorAll("[data-book-panel]").forEach((panel) => {
+      const isActive = panel.dataset.bookPanel === nextView;
+      panel.classList.toggle("is-active", isActive);
+      panel.hidden = !isActive;
+    });
+  };
+
   const initializeAppScreens = () => {
     if (!elements.appShell || document.getElementById("homeScreen")) {
       return;
@@ -1422,6 +1440,8 @@
     const sectionBrowser = elements.appShell.querySelector(".section-browser");
     const featureGrid = elements.appShell.querySelector(".feature-grid");
     const knowledgeTools = elements.appShell.querySelector(".knowledge-tools");
+    const knowledgeCards = Array.from(knowledgeTools?.querySelectorAll(".knowledge-card") || []);
+    const [bookSearchCard, bookAskCard] = knowledgeCards;
     const examSection = document.getElementById("examSection");
     const reviewSection = document.getElementById("reviewSection");
 
@@ -1487,18 +1507,36 @@
     bookScreen.id = "bookScreen";
     bookScreen.insertAdjacentHTML(
       "beforeend",
-      createScreenHeaderMarkup(
+      `${createScreenHeaderMarkup(
         "Kitap",
         "Mustakil Okuma Alani",
-        "Kitap okuyucu bu ekranda tek basina yer alir. Arama ve kitaba soru sorma araclari da ayni ekranda bulunur.",
-      ),
+        "Kitap alani sade tutuldu. Okuma, arama ve soru sorma ayri gorunumlerde acilir.",
+      )}
+      <section class="book-workspace">
+        <div class="book-view-switch" role="tablist" aria-label="Kitap araclari">
+          <button class="book-view-button is-active" type="button" role="tab" aria-selected="true" data-book-view="read">Oku</button>
+          <button class="book-view-button" type="button" role="tab" aria-selected="false" data-book-view="search">Ara</button>
+          <button class="book-view-button" type="button" role="tab" aria-selected="false" data-book-view="ask">Sor</button>
+        </div>
+        <section class="book-panel is-active" data-book-panel="read"></section>
+        <section class="book-panel" data-book-panel="search" hidden></section>
+        <section class="book-panel" data-book-panel="ask" hidden></section>
+      </section>`,
     );
-    if (elements.readerSection) {
-      bookScreen.appendChild(elements.readerSection);
+    const bookReadPanel = bookScreen.querySelector('[data-book-panel="read"]');
+    const bookSearchPanel = bookScreen.querySelector('[data-book-panel="search"]');
+    const bookAskPanel = bookScreen.querySelector('[data-book-panel="ask"]');
+    if (elements.readerSection && bookReadPanel) {
+      elements.readerSection.classList.add("book-panel-card");
+      bookReadPanel.appendChild(elements.readerSection);
     }
-    if (knowledgeTools) {
-      knowledgeTools.classList.add("book-tools");
-      bookScreen.appendChild(knowledgeTools);
+    if (bookSearchCard && bookSearchPanel) {
+      bookSearchCard.classList.add("book-panel-card");
+      bookSearchPanel.appendChild(bookSearchCard);
+    }
+    if (bookAskCard && bookAskPanel) {
+      bookAskCard.classList.add("book-panel-card");
+      bookAskPanel.appendChild(bookAskCard);
     }
 
     const examScreen = document.createElement("section");
@@ -1537,6 +1575,12 @@
     elements.appShell.querySelectorAll("[data-open-screen]").forEach((button) => {
       button.addEventListener("click", () => {
         setActiveNav(button.dataset.openScreen);
+      });
+    });
+
+    bookScreen.querySelectorAll("[data-book-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setBookView(button.dataset.bookView);
       });
     });
   };
@@ -1852,16 +1896,15 @@
       state.readerSectionId === "all" ? "Tum kitap" : getReaderSectionMeta(state.readerSectionId)?.title || "Secili bolum";
     const progressValue = visiblePages.length ? Math.round(((currentIndex + 1) / visiblePages.length) * 100) : 0;
     const cards = [
-      { label: "Okuma Alani", value: currentSectionLabel },
-      { label: "Secili Sayfa", value: currentPage?.pageLabel || "-" },
+      { label: "Alan", value: currentSectionLabel },
+      { label: "Sayfa", value: currentPage?.pageLabel || "-" },
       { label: "Ilerleme", value: `%${progressValue}` },
-      { label: "Eslesen Sayfa", value: visiblePages.length },
     ];
 
     elements.readerMeta.innerHTML = cards
       .map(
         (item) => `
-          <article class="reader-stat-card">
+          <article class="reader-meta-pill">
             <span>${escapeHtml(item.label)}</span>
             <strong>${escapeHtml(String(item.value))}</strong>
           </article>
@@ -2031,6 +2074,7 @@
     }
 
     renderBookReader();
+    setBookView("read");
     setActiveNav("bookScreen");
   };
 
@@ -3026,6 +3070,7 @@
   });
 
   initializeAppScreens();
+  setBookView(state.bookView);
   renderHeroStats();
   renderFeatureStats();
   state.readerPageId = getReaderStartPageId();
