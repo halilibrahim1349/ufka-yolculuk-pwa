@@ -2,6 +2,15 @@
   const STORAGE_KEY = "ufka-study-state-v3-reset";
   const LETTERS = ["A", "B", "C", "D", "E"];
   const SMART_REVIEW_LIMIT = 20;
+  const READER_DEFAULTS = {
+    theme: "paper",
+    density: "relaxed",
+    fontScale: 100,
+    mode: "standard",
+  };
+  const READER_FONT_MIN = 88;
+  const READER_FONT_MAX = 132;
+  const READER_FONT_STEP = 4;
   const EXAM_PRESETS = {
     mini: {
       mode: "exam-mini",
@@ -74,7 +83,14 @@
     readerSectionSelect: document.getElementById("readerSectionSelect"),
     readerFilterInput: document.getElementById("readerFilterInput"),
     clearReaderFilterButton: document.getElementById("clearReaderFilterButton"),
+    readerThemeControls: document.getElementById("readerThemeControls"),
+    readerDensityControls: document.getElementById("readerDensityControls"),
+    readerModeControls: document.getElementById("readerModeControls"),
+    readerFontDecreaseButton: document.getElementById("readerFontDecreaseButton"),
+    readerFontIncreaseButton: document.getElementById("readerFontIncreaseButton"),
+    readerFontValue: document.getElementById("readerFontValue"),
     readerMeta: document.getElementById("readerMeta"),
+    readerChapterList: document.getElementById("readerChapterList"),
     readerPrevButton: document.getElementById("readerPrevButton"),
     readerNextButton: document.getElementById("readerNextButton"),
     readerPageStatus: document.getElementById("readerPageStatus"),
@@ -82,8 +98,11 @@
     readerPageTitle: document.getElementById("readerPageTitle"),
     readerPageInfo: document.getElementById("readerPageInfo"),
     readerPageActions: document.getElementById("readerPageActions"),
+    readerProgressFill: document.getElementById("readerProgressFill"),
+    readerProgressLabel: document.getElementById("readerProgressLabel"),
     readerEmptyState: document.getElementById("readerEmptyState"),
     readerText: document.getElementById("readerText"),
+    readerPageFooter: document.getElementById("readerPageFooter"),
     searchInput: document.getElementById("searchInput"),
     bookSearchInput: document.getElementById("bookSearchInput"),
     clearBookSearchButton: document.getElementById("clearBookSearchButton"),
@@ -148,9 +167,9 @@
   const loadPersisted = () => {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return parsed || { results: {}, customQuestions: {}, examHistory: [] };
+      return parsed || { results: {}, customQuestions: {}, examHistory: [], readerPrefs: {}, readerState: {} };
     } catch {
-      return { results: {}, customQuestions: {}, examHistory: [] };
+      return { results: {}, customQuestions: {}, examHistory: [], readerPrefs: {}, readerState: {} };
     }
   };
 
@@ -158,6 +177,8 @@
   persisted.results = persisted.results || {};
   persisted.customQuestions = persisted.customQuestions || {};
   persisted.examHistory = Array.isArray(persisted.examHistory) ? persisted.examHistory : [];
+  persisted.readerPrefs = { ...READER_DEFAULTS, ...(persisted.readerPrefs || {}) };
+  persisted.readerState = persisted.readerState || {};
 
   const state = {
     query: "",
@@ -176,15 +197,51 @@
     timerIntervalId: null,
     completionReason: "",
     navTarget: "homeSection",
-    readerSectionId: "all",
-    readerQuery: "",
-    readerPageId: null,
+    readerSectionId: persisted.readerState.sectionId || "all",
+    readerQuery: persisted.readerState.query || "",
+    readerPageId: persisted.readerState.pageId || null,
+    readerTheme: persisted.readerPrefs.theme,
+    readerDensity: persisted.readerPrefs.density,
+    readerFontScale: persisted.readerPrefs.fontScale,
+    readerMode: persisted.readerPrefs.mode,
   };
+
+  state.readerFontScale = clamp(Number(state.readerFontScale) || READER_DEFAULTS.fontScale, READER_FONT_MIN, READER_FONT_MAX);
+  if (!["paper", "sepia", "night"].includes(state.readerTheme)) {
+    state.readerTheme = READER_DEFAULTS.theme;
+  }
+  if (!["compact", "relaxed", "airy"].includes(state.readerDensity)) {
+    state.readerDensity = READER_DEFAULTS.density;
+  }
+  if (!["standard", "focus"].includes(state.readerMode)) {
+    state.readerMode = READER_DEFAULTS.mode;
+  }
 
   let deferredInstallPrompt = null;
 
   const savePersisted = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+  };
+
+  const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+
+  const persistReaderPreferences = () => {
+    persisted.readerPrefs = {
+      theme: state.readerTheme,
+      density: state.readerDensity,
+      fontScale: state.readerFontScale,
+      mode: state.readerMode,
+    };
+    savePersisted();
+  };
+
+  const persistReaderLocation = () => {
+    persisted.readerState = {
+      sectionId: state.readerSectionId,
+      query: state.readerQuery,
+      pageId: state.readerPageId,
+    };
+    savePersisted();
   };
 
   const getSummaryParts = (summary) => (Array.isArray(summary) ? summary.filter(Boolean) : []);
@@ -475,6 +532,94 @@
       }
     });
     return items;
+  };
+
+  const getReaderEstimatedMinutes = (wordCount) => Math.max(1, Math.round((Number(wordCount) || 0) / 185));
+
+  const applyReaderPreferences = () => {
+    if (!elements.readerSection) {
+      return;
+    }
+
+    elements.readerSection.dataset.readerTheme = state.readerTheme;
+    elements.readerSection.dataset.readerDensity = state.readerDensity;
+    elements.readerSection.dataset.readerMode = state.readerMode;
+    elements.readerSection.style.setProperty("--reader-font-scale", `${state.readerFontScale / 100}`);
+
+    if (elements.readerFontValue) {
+      elements.readerFontValue.textContent = `${state.readerFontScale}%`;
+    }
+
+    elements.readerThemeControls?.querySelectorAll("[data-reader-theme]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.readerTheme === state.readerTheme);
+    });
+
+    elements.readerDensityControls?.querySelectorAll("[data-reader-density]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.readerDensity === state.readerDensity);
+    });
+
+    elements.readerModeControls?.querySelectorAll("[data-reader-mode]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.readerMode === state.readerMode);
+    });
+
+    if (elements.readerFontDecreaseButton) {
+      elements.readerFontDecreaseButton.disabled = state.readerFontScale <= READER_FONT_MIN;
+    }
+    if (elements.readerFontIncreaseButton) {
+      elements.readerFontIncreaseButton.disabled = state.readerFontScale >= READER_FONT_MAX;
+    }
+  };
+
+  const renderReaderChapterList = (visiblePages, currentPage) => {
+    if (!elements.readerChapterList) {
+      return;
+    }
+
+    const chapterItems = readerSections
+      .map((section) => {
+        const pages = readerPages.filter((page) => (page.sectionIds || []).includes(section.id));
+        const visibleCount = visiblePages.filter((page) => (page.sectionIds || []).includes(section.id)).length;
+        return {
+          section,
+          pages,
+          visibleCount,
+          isActive:
+            state.readerSectionId === section.id ||
+            (state.readerSectionId === "all" && (currentPage?.sectionIds || []).includes(section.id)),
+        };
+      })
+      .filter((item) => item.pages.length);
+
+    elements.readerChapterList.innerHTML = chapterItems
+      .map((item) => {
+        const firstPage = item.pages[0];
+        const pageCountLabel = `${item.pages.length} sayfa`;
+        const visibleLabel =
+          state.readerSectionId === "all" || !state.readerQuery ? pageCountLabel : `${item.visibleCount} eslesen sayfa`;
+        return `
+          <button
+            class="reader-chapter-card ${item.isActive ? "is-active" : ""}"
+            type="button"
+            data-reader-chapter="${escapeHtml(item.section.id)}"
+            data-reader-chapter-page="${escapeHtml(firstPage.id)}"
+          >
+            <span class="reader-chapter-card__range">${escapeHtml(item.section.pageRange || firstPage.pageLabel || "")}</span>
+            <strong>${escapeHtml(item.section.title)}</strong>
+            <span>${escapeHtml(visibleLabel)}</span>
+          </button>
+        `;
+      })
+      .join("");
+
+    elements.readerChapterList.querySelectorAll("[data-reader-chapter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openReader({
+          sectionId: button.dataset.readerChapter,
+          pageId: button.dataset.readerChapterPage,
+          query: "",
+        });
+      });
+    });
   };
 
   const scoreKnowledgeRecord = (record, rawQuery, queryTokens) => {
@@ -1278,7 +1423,7 @@
     `;
   };
 
-  const renderReaderMeta = (visiblePages) => {
+  const renderReaderMetaLegacy = (visiblePages) => {
     const currentSectionLabel =
       state.readerSectionId === "all" ? "Tum kitap" : getReaderSectionMeta(state.readerSectionId)?.title || "Secili bolum";
     const cards = [
@@ -1299,7 +1444,7 @@
       .join("");
   };
 
-  const renderBookReader = () => {
+  const renderBookReaderLegacy = () => {
     if (!elements.readerSection) {
       return;
     }
@@ -1396,6 +1541,195 @@
     elements.readerEmptyState.classList.add("hidden");
     elements.readerEmptyState.innerHTML = "";
     elements.readerText.innerHTML = paragraphMarkup || `<p>${highlightText(currentPage.text, state.readerQuery)}</p>`;
+
+    elements.readerPageStrip.querySelectorAll("[data-reader-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.readerPageId = button.dataset.readerPage;
+        renderBookReader();
+      });
+    });
+
+    elements.readerPageActions.querySelectorAll("[data-reader-open-summary]").forEach((button) => {
+      button.addEventListener("click", () => openSummaryModal(button.dataset.readerOpenSummary));
+    });
+
+    elements.readerPageActions.querySelectorAll("[data-reader-open-test]").forEach((button) => {
+      button.addEventListener("click", () => openStudy(button.dataset.readerOpenTest, "section"));
+    });
+  };
+
+  const openReaderLegacy = ({ sectionId, pageId, query, scroll = true } = {}) => {
+    if (typeof sectionId === "string" && sectionId) {
+      state.readerSectionId = sectionId;
+    }
+
+    if (typeof query === "string") {
+      state.readerQuery = query;
+    }
+
+    if (typeof pageId === "string" && pageId) {
+      state.readerPageId = pageId;
+    } else if (!state.readerPageId || (sectionId && sectionId !== "all")) {
+      state.readerPageId = getReaderStartPageId(state.readerSectionId);
+    }
+
+    renderBookReader();
+    setActiveNav("readerSection");
+
+    if (scroll) {
+      elements.readerSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const renderReaderMeta = (visiblePages, currentPage, currentIndex) => {
+    const currentSectionLabel =
+      state.readerSectionId === "all" ? "Tum kitap" : getReaderSectionMeta(state.readerSectionId)?.title || "Secili bolum";
+    const progressValue = visiblePages.length ? Math.round(((currentIndex + 1) / visiblePages.length) * 100) : 0;
+    const cards = [
+      { label: "Okuma Alani", value: currentSectionLabel },
+      { label: "Secili Sayfa", value: currentPage?.pageLabel || "-" },
+      { label: "Ilerleme", value: `%${progressValue}` },
+      { label: "Eslesen Sayfa", value: visiblePages.length },
+    ];
+
+    elements.readerMeta.innerHTML = cards
+      .map(
+        (item) => `
+          <article class="reader-stat-card">
+            <span>${escapeHtml(item.label)}</span>
+            <strong>${escapeHtml(String(item.value))}</strong>
+          </article>
+        `,
+      )
+      .join("");
+  };
+
+  const renderBookReader = () => {
+    if (!elements.readerSection) {
+      return;
+    }
+
+    if (!readerPages.length) {
+      elements.readerSection.classList.add("hidden");
+      return;
+    }
+
+    elements.readerSection.classList.remove("hidden");
+    if (elements.openReaderButton) {
+      elements.openReaderButton.textContent = state.readerPageId ? "Kaldigin Yerden Devam Et" : "Okumaya Gec";
+    }
+    applyReaderPreferences();
+
+    const sectionOptions = [
+      { id: "all", title: "Tum kitap", pageRange: `${readerPages.length} sayfa` },
+      ...readerSections,
+    ];
+
+    elements.readerSectionSelect.innerHTML = sectionOptions
+      .map(
+        (section) =>
+          `<option value="${escapeHtml(section.id)}">${escapeHtml(section.title)}${section.pageRange ? ` - ${escapeHtml(section.pageRange)}` : ""}</option>`,
+      )
+      .join("");
+
+    elements.readerSectionSelect.value = sectionOptions.some((section) => section.id === state.readerSectionId)
+      ? state.readerSectionId
+      : "all";
+    elements.readerFilterInput.value = state.readerQuery;
+
+    const visiblePages = getReaderVisiblePages();
+
+    if (!visiblePages.length) {
+      renderReaderMeta([], null, 0);
+      elements.readerChapterList.innerHTML = "";
+      elements.readerPrevButton.disabled = true;
+      elements.readerNextButton.disabled = true;
+      elements.readerPageStatus.textContent = "Bu filtre icin okunabilir sayfa bulunamadi.";
+      elements.readerPageStrip.innerHTML = "";
+      elements.readerPageTitle.textContent = "Okunacak sayfa bulunamadi";
+      elements.readerPageInfo.textContent = "Filtreyi temizleyerek veya baska bir bolum secerek devam edebilirsin.";
+      elements.readerPageActions.innerHTML = "";
+      elements.readerProgressFill.style.width = "0%";
+      elements.readerProgressLabel.textContent = "Ilerleme gosterilemiyor";
+      elements.readerText.innerHTML = "";
+      elements.readerPageFooter.innerHTML = "";
+      elements.readerEmptyState.classList.remove("hidden");
+      elements.readerEmptyState.innerHTML =
+        '<div class="empty-state">Bu filtre veya bolum secimi icin kitap metninde gosterilecek sayfa bulunamadi.</div>';
+      persistReaderLocation();
+      return;
+    }
+
+    const currentPage = visiblePages.find((page) => page.id === state.readerPageId) || visiblePages[0];
+    state.readerPageId = currentPage.id;
+    const currentIndex = visiblePages.findIndex((page) => page.id === currentPage.id);
+    const currentSection = currentPage.primarySectionId ? getReaderSectionMeta(currentPage.primarySectionId) : null;
+    const progressPercent = visiblePages.length ? Math.round(((currentIndex + 1) / visiblePages.length) * 100) : 0;
+    const estimatedMinutes = getReaderEstimatedMinutes(currentPage.wordCount);
+
+    renderReaderMeta(visiblePages, currentPage, currentIndex);
+    renderReaderChapterList(visiblePages, currentPage);
+
+    elements.readerPrevButton.disabled = currentIndex <= 0;
+    elements.readerNextButton.disabled = currentIndex >= visiblePages.length - 1;
+    elements.readerPageStatus.textContent = `Sayfa ${currentIndex + 1} / ${visiblePages.length} - ${currentPage.locationLabel}`;
+    elements.readerPageTitle.textContent = currentPage.title || currentPage.pageLabel || "Kitap sayfasi";
+    elements.readerPageInfo.textContent = `${currentPage.sectionLabel} - ${currentPage.wordCount || 0} kelime - yaklasik ${estimatedMinutes} dk`;
+    elements.readerProgressFill.style.width = `${progressPercent}%`;
+    elements.readerProgressLabel.textContent = `Gorunur havuzda %${progressPercent} ilerleme - ${currentIndex + 1}/${visiblePages.length}`;
+
+    const pageWindow = buildReaderPageWindow(visiblePages, currentIndex);
+    elements.readerPageStrip.innerHTML = pageWindow
+      .map((item) => {
+        if (item.type === "gap") {
+          return '<span class="reader-page-gap">...</span>';
+        }
+        const page = item.page;
+        const label = page.bookPage ? `s. ${page.bookPage}` : `PDF ${page.pdfPage}`;
+        return `
+          <button
+            class="reader-page-chip ${page.id === currentPage.id ? "is-active" : ""}"
+            type="button"
+            data-reader-page="${escapeHtml(page.id)}"
+          >
+            ${escapeHtml(label)}
+          </button>
+        `;
+      })
+      .join("");
+
+    const actionButtons = [];
+    if (currentSection?.id) {
+      actionButtons.push(
+        `<button class="ghost-button" type="button" data-reader-open-summary="${escapeHtml(currentSection.id)}">Bolum Ozeti</button>`,
+      );
+      actionButtons.push(
+        `<button class="ghost-button" type="button" data-reader-open-test="${escapeHtml(currentSection.id)}">Bu Konunun Testi</button>`,
+      );
+    }
+    elements.readerPageActions.innerHTML = actionButtons.join("");
+
+    const paragraphMarkup = buildReaderParagraphs(currentPage.text)
+      .map((paragraph, index) => {
+        const classes = ["reader-text__paragraph"];
+        if (paragraph.startsWith("*")) {
+          classes.push("reader-text__bullet");
+        } else if (index === 0) {
+          classes.push("reader-text__lead");
+        }
+        return `<p class="${classes.join(" ")}">${highlightText(paragraph, state.readerQuery)}</p>`;
+      })
+      .join("");
+
+    elements.readerEmptyState.classList.add("hidden");
+    elements.readerEmptyState.innerHTML = "";
+    elements.readerText.innerHTML = paragraphMarkup || `<p>${highlightText(currentPage.text, state.readerQuery)}</p>`;
+    elements.readerPageFooter.innerHTML = `
+      <span>${escapeHtml(currentPage.sectionLabel || "Kitap metni")}</span>
+      <strong>${escapeHtml(currentPage.pageLabel || currentPage.locationLabel || "Sayfa")}</strong>
+      <span>${escapeHtml(currentPage.locationLabel || "")}</span>
+    `;
+    persistReaderLocation();
 
     elements.readerPageStrip.querySelectorAll("[data-reader-page]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -2053,6 +2387,37 @@
     renderBookReader();
     elements.readerFilterInput.focus();
   });
+  elements.readerThemeControls?.querySelectorAll("[data-reader-theme]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.readerTheme = button.dataset.readerTheme || READER_DEFAULTS.theme;
+      persistReaderPreferences();
+      renderBookReader();
+    });
+  });
+  elements.readerDensityControls?.querySelectorAll("[data-reader-density]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.readerDensity = button.dataset.readerDensity || READER_DEFAULTS.density;
+      persistReaderPreferences();
+      renderBookReader();
+    });
+  });
+  elements.readerModeControls?.querySelectorAll("[data-reader-mode]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.readerMode = button.dataset.readerMode || READER_DEFAULTS.mode;
+      persistReaderPreferences();
+      renderBookReader();
+    });
+  });
+  elements.readerFontDecreaseButton?.addEventListener("click", () => {
+    state.readerFontScale = clamp(state.readerFontScale - READER_FONT_STEP, READER_FONT_MIN, READER_FONT_MAX);
+    persistReaderPreferences();
+    renderBookReader();
+  });
+  elements.readerFontIncreaseButton?.addEventListener("click", () => {
+    state.readerFontScale = clamp(state.readerFontScale + READER_FONT_STEP, READER_FONT_MIN, READER_FONT_MAX);
+    persistReaderPreferences();
+    renderBookReader();
+  });
   elements.readerPrevButton.addEventListener("click", () => {
     const visiblePages = getReaderVisiblePages();
     const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
@@ -2066,6 +2431,37 @@
     const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
     if (currentIndex >= 0 && currentIndex < visiblePages.length - 1) {
       state.readerPageId = visiblePages[currentIndex + 1].id;
+      renderBookReader();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    const targetTag = event.target?.tagName;
+    if (targetTag === "INPUT" || targetTag === "TEXTAREA" || targetTag === "SELECT") {
+      return;
+    }
+    if (state.navTarget !== "readerSection") {
+      return;
+    }
+
+    const visiblePages = getReaderVisiblePages();
+    const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
+
+    if (event.key === "ArrowLeft" && currentIndex > 0) {
+      event.preventDefault();
+      state.readerPageId = visiblePages[currentIndex - 1].id;
+      renderBookReader();
+    }
+
+    if (event.key === "ArrowRight" && currentIndex >= 0 && currentIndex < visiblePages.length - 1) {
+      event.preventDefault();
+      state.readerPageId = visiblePages[currentIndex + 1].id;
+      renderBookReader();
+    }
+
+    if (event.key.toLowerCase() === "f") {
+      event.preventDefault();
+      state.readerMode = state.readerMode === "focus" ? "standard" : "focus";
+      persistReaderPreferences();
       renderBookReader();
     }
   });
