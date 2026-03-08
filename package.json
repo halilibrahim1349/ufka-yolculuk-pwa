@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.96",
+    "@tesseract.js-data/tur": "^1.0.0",
+    "pdfjs-dist": "^5.5.207",
+    "tesseract.js": "^7.0.0"
+  },
+  "name": "ufka-yolculuk",
+  "private": true,
+  "scripts": {
+    "build:book-content": "node scripts/build-book-content.mjs",
+    "start": "node server.mjs",
+    "dev": "node server.mjs"
+  }
+}

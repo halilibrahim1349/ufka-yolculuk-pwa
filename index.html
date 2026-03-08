@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ufka Yolculuk Sınav Hazırlık</title>
+    <meta
+      name="description"
+      content="Ufka Yolculuk çalışma kitabı için konu bazlı, zor seviyede, ALES tarzı test uygulaması."
+    />
+    <meta name="theme-color" content="#0f5c5c" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Ufka Yolculuk" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/pwa/favicon-64.png" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/pwa/apple-touch-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell" id="homeSection">
+      <header class="hero">
+        <p class="eyebrow">HTML tabanlı mobil çalışma ekranı</p>
+        <h1>Ufka Yolculuk Sınav Hazırlık</h1>
+        <p class="hero-copy">
+          Konu baslangiclarina gore ayrilmis zor testler, uzun paragraf sorulari, dogrudan bilgi secmeleri ve kitabin tam metni
+          uzerinde arama modulu.
+        </p>
+        <div class="hero-actions">
+          <button class="ghost-button" id="wrongOnlyButton" type="button">Yanlışları Çöz</button>
+          <button class="ghost-button" id="exportButton" type="button">Özel Soruları Dışa Aktar</button>
+          <button class="ghost-button hidden" id="installAppButton" type="button">Uygulamayı Yükle</button>
+        </div>
+        <p class="pwa-note" id="pwaNote">PWA kurulumu için uygulamayı localhost veya HTTPS üzerinden aç.</p>
+        <div class="stat-grid" id="heroStats"></div>
+      </header>
+
+      <section class="feature-grid">
+        <article class="feature-card" id="examSection">
+          <div>
+            <p class="eyebrow">Deneme Modu</p>
+            <h2>Karışık Denemeler</h2>
+            <p>
+              Konular arası dengeli dağıtılan sorularla süreli deneme çöz. Sonuç ekranında doğrularını, yanlışlarını ve
+              boşlarını toplu gör.
+            </p>
+          </div>
+          <div class="feature-metric-grid" id="examStats"></div>
+          <div class="feature-actions">
+            <button class="primary-button" id="startMiniExamButton" type="button">30 Soruluk Deneme</button>
+            <button class="ghost-button" id="startFullExamButton" type="button">50 Soruluk Deneme</button>
+          </div>
+        </article>
+
+        <article class="feature-card" id="reviewSection">
+          <div>
+            <p class="eyebrow">Akıllı Tekrar</p>
+            <h2>Yanlışlardan Otomatik Tekrar</h2>
+            <p>
+              Son yanlışların, eksik bıraktığın zor sorular ve en çok hata yaptığın konular tek oturumda karışık olarak
+              gelir.
+            </p>
+          </div>
+          <div class="feature-metric-grid" id="reviewStats"></div>
+          <div class="feature-actions">
+            <button class="primary-button" id="startAutoReviewButton" type="button">Tekrarı Başlat</button>
+            <button class="ghost-button" id="startWrongOnlyButton" type="button">Sadece Yanlışlar</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="toolbar">
+        <label class="search-box" for="searchInput">
+          <span>Konu kartlarini filtrele</span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Bolum, konu veya ozet ara"
+            autocomplete="off"
+          />
+        </label>
+      </section>
+
+      <section class="knowledge-tools">
+        <article class="feature-card knowledge-card">
+          <div>
+            <p class="eyebrow">Kitapta Ara</p>
+            <h2>Metin Icinde Arama</h2>
+            <p>
+              Kitabin OCR metni uygulama icine gomulu. Kavram, ifade veya konu arat; en ilgili bolumleri, sayfalari ve
+              alintilari hemen getir.
+            </p>
+          </div>
+          <label class="search-box" for="bookSearchInput">
+            <span>Kitap aramasi</span>
+            <input
+              id="bookSearchInput"
+              type="search"
+              placeholder="Ornek: saglam inanc, vahiy, kader, tevekkul"
+              autocomplete="off"
+            />
+          </label>
+          <div class="feature-actions">
+            <button class="ghost-button" id="clearBookSearchButton" type="button">Aramayi Temizle</button>
+          </div>
+          <div class="book-search-results" id="bookSearchResults"></div>
+        </article>
+
+        <article class="feature-card knowledge-card">
+          <div>
+            <p class="eyebrow">Kitaba Sor</p>
+            <h2>Metinden Cevap Getir</h2>
+            <p>
+              Sorunu yaz. Uygulama kitabin ilgili kisimlarini tarayip kisa cevap, dayanak alinti ve gidilecek bolumu birlikte
+              gosterir.
+            </p>
+          </div>
+          <label class="search-box" for="askBookInput">
+            <span>Sorun</span>
+            <textarea
+              id="askBookInput"
+              rows="4"
+              placeholder="Ornek: Kitaba gore saglam inanc nasil kurulur?"
+            ></textarea>
+          </label>
+          <div class="feature-actions">
+            <button class="primary-button" id="askBookButton" type="button">Soruyu Cevapla</button>
+            <button class="ghost-button" id="clearAskBookButton" type="button">Temizle</button>
+          </div>
+          <section class="qa-answer hidden" id="qaAnswer"></section>
+        </article>
+      </section>
+
+      <section class="section-grid" id="sectionGrid"></section>
+    </main>
+
+    <nav class="bottom-nav" id="bottomNav" aria-label="Alt gezinme">
+      <button class="bottom-nav__item is-active" data-nav-target="homeSection" type="button">Konular</button>
+      <button class="bottom-nav__item" data-nav-target="examSection" type="button">Deneme</button>
+      <button class="bottom-nav__item" data-nav-target="reviewSection" type="button">Tekrar</button>
+    </nav>
+
+    <section class="study-overlay hidden" id="studyOverlay" aria-hidden="true">
+      <div class="study-panel">
+        <header class="study-header">
+          <button class="back-button" id="closeStudy" type="button">Geri</button>
+          <div class="study-meta">
+            <p class="eyebrow" id="studyRange"></p>
+            <h2 id="studyTitle"></h2>
+            <p id="studyDescription"></p>
+          </div>
+          <div class="study-actions">
+            <button class="ghost-button hidden" id="openSummaryButton" type="button">Bölüm Özeti</button>
+            <button class="ghost-button" id="shuffleButton" type="button">Karıştır</button>
+            <button class="ghost-button hidden" id="finishSessionButton" type="button">Oturumu Bitir</button>
+            <button class="ghost-button" id="openAddModal" type="button">Soru Ekle</button>
+          </div>
+        </header>
+
+        <div class="progress-strip">
+          <div>
+            <span id="progressLabel">Soru 1 / 4</span>
+            <strong id="progressSummary">Hazır</strong>
+          </div>
+          <div class="progress-tools">
+            <span class="metric muted hidden" id="studyTimer">00:00</span>
+            <button class="ghost-button" id="sectionWrongButton" type="button">Bu Konuda Yanlışlar</button>
+          </div>
+        </div>
+
+        <article class="question-card" id="questionCard">
+          <div class="question-tags">
+            <span class="tag" id="typeTag"></span>
+            <span class="tag muted" id="difficultyTag"></span>
+            <span class="tag muted" id="customTag"></span>
+          </div>
+          <div class="question-text" id="questionStem"></div>
+          <div class="option-list" id="optionList"></div>
+          <div class="feedback hidden" id="feedbackBox"></div>
+        </article>
+
+        <section class="session-summary hidden" id="sessionSummary"></section>
+
+        <div class="study-footer">
+          <button class="primary-button" id="checkButton" type="button">Cevabı Kontrol Et</button>
+          <button class="ghost-button" id="nextButton" type="button">Sonraki</button>
+        </div>
+      </div>
+    </section>
+
+    <dialog class="question-modal summary-modal" id="summaryModal">
+      <div class="summary-modal__panel">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Bölüm Özeti</p>
+            <h3 id="summaryTitle"></h3>
+            <p class="summary-modal__range" id="summaryRange"></p>
+          </div>
+          <button class="ghost-button" id="summaryCloseButton" type="button">Kapat</button>
+        </div>
+
+        <div class="summary-modal__copy" id="summaryBody"></div>
+
+        <div class="study-footer">
+          <button class="ghost-button" id="summaryStartButton" type="button">Bu Konuyu Çöz</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="question-modal" id="addModal">
+      <form method="dialog" id="questionForm">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Özel Soru</p>
+            <h3>Konuya Yeni Soru Ekle</h3>
+          </div>
+          <button class="ghost-button" type="submit">Kapat</button>
+        </div>
+
+        <label>
+          <span>Soru</span>
+          <textarea id="customStem" rows="5" required></textarea>
+        </label>
+
+        <label>
+          <span>Tür</span>
+          <select id="customType">
+            <option value="paragraph">Paragraf</option>
+            <option value="direct">Doğrudan Bilgi</option>
+          </select>
+        </label>
+
+        <div class="option-editor">
+          <label>
+            <span>Seçenek A</span>
+            <input id="optionA" type="text" required />
+          </label>
+          <label>
+            <span>Seçenek B</span>
+            <input id="optionB" type="text" required />
+          </label>
+          <label>
+            <span>Seçenek C</span>
+            <input id="optionC" type="text" required />
+          </label>
+          <label>
+            <span>Seçenek D</span>
+            <input id="optionD" type="text" required />
+          </label>
+        </div>
+
+        <label>
+          <span>Doğru Seçenek</span>
+          <select id="correctOption">
+            <option value="0">A</option>
+            <option value="1">B</option>
+            <option value="2">C</option>
+            <option value="3">D</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Açıklama</span>
+          <textarea id="customExplanation" rows="4" required></textarea>
+        </label>
+
+        <button class="primary-button full-width" type="button" id="saveCustomQuestion">Kaydet</button>
+      </form>
+    </dialog>
+
+    <script src="data/quiz-data.js"></script>
+    <script src="data/section-s123-fix.js"></script>
+    <script src="data/section-s1-learning.js"></script>
+    <script src="data/section-s2-learning.js"></script>
+    <script src="data/section-s3-learning.js"></script>
+    <script src="data/section-s4.js"></script>
+    <script src="data/section-s4-learning.js"></script>
+    <script src="data/section-s5.js"></script>
+    <script src="data/section-s5-learning.js"></script>
+    <script src="data/section-s6.js"></script>
+    <script src="data/section-s6-learning.js"></script>
+    <script src="data/section-s7.js"></script>
+    <script src="data/section-s7-learning.js"></script>
+    <script src="data/section-s8.js"></script>
+    <script src="data/section-s8-learning.js"></script>
+    <script src="data/section-s9.js"></script>
+    <script src="data/section-s9-learning.js"></script>
+    <script src="data/book-content.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
+

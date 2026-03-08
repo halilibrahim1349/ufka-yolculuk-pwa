@@ -1,0 +1,21 @@
+[build]
+publish = "."
+command = "echo Netlify static deploy"
+
+[[headers]]
+for = "/service-worker.js"
+[headers.values]
+Cache-Control = "no-cache"
+Service-Worker-Allowed = "/"
+
+[[headers]]
+for = "/manifest.webmanifest"
+[headers.values]
+Cache-Control = "no-cache"
+
+[[headers]]
+for = "/*"
+[headers.values]
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "SAMEORIGIN"
+Referrer-Policy = "strict-origin-when-cross-origin"

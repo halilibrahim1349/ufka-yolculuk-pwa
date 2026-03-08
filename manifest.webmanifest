@@ -1,0 +1,31 @@
+{
+  "name": "Ufka Yolculuk S?nav Haz?rl?k",
+  "short_name": "Ufka Quiz",
+  "description": "Ufka Yolculuk ?al??ma kitab? i?in konu bazl?, zor seviye, ALES tarz? soru uygulamas?.",
+  "lang": "tr-TR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0f5c5c",
+  "background_color": "#f8f1e4",
+  "categories": ["education", "books", "productivity"],
+  "icons": [
+    {
+      "src": "./assets/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/pwa/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
