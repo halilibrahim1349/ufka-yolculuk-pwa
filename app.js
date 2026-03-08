@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   const STORAGE_KEY = "ufka-study-state-v3-reset";
   const LETTERS = ["A", "B", "C", "D", "E"];
   const SMART_REVIEW_LIMIT = 20;
@@ -17,14 +17,14 @@
       count: 30,
       durationMinutes: 35,
       title: "30 Soruluk Deneme",
-      description: "Karışık konu dağılımı ile süreli deneme oturumu.",
+      description: "KarÄ±ÅŸÄ±k konu daÄŸÄ±lÄ±mÄ± ile sÃ¼reli deneme oturumu.",
     },
     full: {
       mode: "exam-full",
       count: 50,
       durationMinutes: 60,
       title: "50 Soruluk Deneme",
-      description: "Geniş kapsamlı süreli karışık deneme oturumu.",
+      description: "GeniÅŸ kapsamlÄ± sÃ¼reli karÄ±ÅŸÄ±k deneme oturumu.",
     },
   };
 
@@ -114,7 +114,7 @@
   if (progressStrip && !document.getElementById("studySummaryPanel")) {
     progressStrip.insertAdjacentHTML(
       "afterend",
-      `<section class="study-summary-panel hidden" id="studySummaryPanel"><p class="eyebrow">Bölüm Özeti</p><div class="study-summary-copy" id="studySummaryCopy"></div></section>`,
+      `<section class="study-summary-panel hidden" id="studySummaryPanel"><p class="eyebrow">BÃ¶lÃ¼m Ã–zeti</p><div class="study-summary-copy" id="studySummaryCopy"></div></section>`,
     );
   }
 
@@ -326,12 +326,12 @@
   const foldForLookup = (value) =>
     String(value || "")
       .toLocaleLowerCase("tr-TR")
-      .replace(/ç/g, "c")
-      .replace(/ğ/g, "g")
-      .replace(/ı/g, "i")
-      .replace(/ö/g, "o")
-      .replace(/ş/g, "s")
-      .replace(/ü/g, "u");
+      .replace(/Ã§/g, "c")
+      .replace(/ÄŸ/g, "g")
+      .replace(/Ä±/g, "i")
+      .replace(/Ã¶/g, "o")
+      .replace(/ÅŸ/g, "s")
+      .replace(/Ã¼/g, "u");
 
   const tokenizeSearchQuery = (value) =>
     foldForLookup(value)
@@ -440,8 +440,8 @@
           sectionId: primarySectionId,
           sectionIds: page.sectionIds || [],
           title: sectionTitles[0] || "Kitap Metni",
-          sectionLabel: sectionTitles.join(" · ") || "Bolum eslesmesi bulunamadi",
-          locationLabel: page.pageLabel ? `${page.pageLabel} · PDF ${page.pdfPage}` : `PDF ${page.pdfPage}`,
+          sectionLabel: sectionTitles.join(" Â· ") || "Bolum eslesmesi bulunamadi",
+          locationLabel: page.pageLabel ? `${page.pageLabel} Â· PDF ${page.pdfPage}` : `PDF ${page.pdfPage}`,
           text: page.text,
         };
       });
@@ -466,8 +466,8 @@
             ? [staticSectionById.get(primarySectionId)?.title].filter(Boolean)
             : [];
       const title = sectionTitles[0] || page.pageLabel || "Kitap Sayfasi";
-      const sectionLabel = sectionTitles.join(" · ") || "Bolum eslesmesi bulunamadi";
-      const locationLabel = page.pageLabel ? `${page.pageLabel} · PDF ${page.pdfPage}` : `PDF ${page.pdfPage}`;
+      const sectionLabel = sectionTitles.join(" Â· ") || "Bolum eslesmesi bulunamadi";
+      const locationLabel = page.pageLabel ? `${page.pageLabel} Â· PDF ${page.pdfPage}` : `PDF ${page.pdfPage}`;
 
       return {
         ...page,
@@ -856,7 +856,7 @@
 
   const getDifficultyScore = (question) => {
     const difficulty = (question.difficulty || "").toLowerCase();
-    if (difficulty.includes("çok zor")) return 4;
+    if (difficulty.includes("Ã§ok zor")) return 4;
     if (difficulty.includes("ales")) return 3;
     if (difficulty.includes("zor")) return 2;
     return 1;
@@ -1077,7 +1077,7 @@
     }
 
     if (Array.isArray(question.options) && Number.isInteger(question.correctIndex)) {
-      return `${getOptionLetter(question.correctIndex)} · ${question.options[question.correctIndex]}`;
+      return `${getOptionLetter(question.correctIndex)} Â· ${question.options[question.correctIndex]}`;
     }
 
     return "";
@@ -1093,7 +1093,7 @@
     }
 
     if (Number.isInteger(answer.selectedIndex) && Array.isArray(question.options)) {
-      return `${getOptionLetter(answer.selectedIndex)} · ${question.options[answer.selectedIndex]}`;
+      return `${getOptionLetter(answer.selectedIndex)} Â· ${question.options[answer.selectedIndex]}`;
     }
 
     return "Bos";
@@ -1123,7 +1123,7 @@
   };
 
   const getPendingNextButtonLabel = (question, finishing) =>
-    hasPendingResponse(question) ? (finishing ? "Kaydet ve Bitir" : "Kaydet ve Geç") : (finishing ? "Boş Bırak ve Bitir" : "Boş Geç");
+    hasPendingResponse(question) ? (finishing ? "Kaydet ve Bitir" : "Kaydet ve GeÃ§") : (finishing ? "BoÅŸ BÄ±rak ve Bitir" : "BoÅŸ GeÃ§");
 
   const getSessionReviewItems = () =>
     state.deck
@@ -1278,8 +1278,8 @@
         mode,
         sectionId,
         title: section?.title || "Konu Testi",
-        description: section?.description || "Konu bazlı ana test oturumu.",
-        range: section?.pageRange || "Konu bölümü",
+        description: section?.description || "Konu bazlÄ± ana test oturumu.",
+        range: section?.pageRange || "Konu bÃ¶lÃ¼mÃ¼",
         summary: section?.summary || [],
         allowCustom: true,
         allowShuffle: true,
@@ -1295,9 +1295,9 @@
         deck: buildSectionDeck(sectionId, "learning"),
         mode,
         sectionId,
-        title: `${section?.title || "Konu"} · Öğretici Çalışma`,
-        description: "Boşluk doldurma ve doğru/yanlış sorularını ayrı öğretici kategori olarak çözüyorsun.",
-        range: section?.pageRange || "Konu bölümü",
+        title: `${section?.title || "Konu"} Â· Ã–ÄŸretici Ã‡alÄ±ÅŸma`,
+        description: "BoÅŸluk doldurma ve doÄŸru/yanlÄ±ÅŸ sorularÄ±nÄ± ayrÄ± Ã¶ÄŸretici kategori olarak Ã§Ã¶zÃ¼yorsun.",
+        range: section?.pageRange || "Konu bÃ¶lÃ¼mÃ¼",
         summary: section?.summary || [],
         allowCustom: false,
         allowShuffle: true,
@@ -1311,9 +1311,9 @@
       startSession({
         deck: getWrongDeck(null, "primary"),
         mode,
-        title: "Yanlışlarım",
-        description: "Ana test kategorisinde daha önce yanlış yaptığın soruları yeniden çözüyorsun.",
-        range: "Yanlış havuzu",
+        title: "YanlÄ±ÅŸlarÄ±m",
+        description: "Ana test kategorisinde daha Ã¶nce yanlÄ±ÅŸ yaptÄ±ÄŸÄ±n sorularÄ± yeniden Ã§Ã¶zÃ¼yorsun.",
+        range: "YanlÄ±ÅŸ havuzu",
         allowCustom: false,
         allowShuffle: true,
         allowWrongButton: false,
@@ -1328,9 +1328,9 @@
         deck: getWrongDeck(sectionId, "primary"),
         mode,
         sectionId,
-        title: `${section?.title || "Konu"} · Yanlışlar`,
-        description: "Bu konudaki ana test yanlışlarını peş peşe çözüyorsun.",
-        range: section?.pageRange || "Konu bölümü",
+        title: `${section?.title || "Konu"} Â· YanlÄ±ÅŸlar`,
+        description: "Bu konudaki ana test yanlÄ±ÅŸlarÄ±nÄ± peÅŸ peÅŸe Ã§Ã¶zÃ¼yorsun.",
+        range: section?.pageRange || "Konu bÃ¶lÃ¼mÃ¼",
         summary: section?.summary || [],
         allowCustom: false,
         allowShuffle: true,
@@ -1348,8 +1348,8 @@
       deck,
       mode: preset.mode,
       title: preset.title,
-      description: `${preset.description} Süre: ${preset.durationMinutes} dakika.`,
-      range: "Karışık konu dağılımı",
+      description: `${preset.description} SÃ¼re: ${preset.durationMinutes} dakika.`,
+      range: "KarÄ±ÅŸÄ±k konu daÄŸÄ±lÄ±mÄ±",
       timerSeconds: preset.durationMinutes * 60,
       allowCustom: false,
       allowShuffle: false,
@@ -1363,9 +1363,9 @@
     startSession({
       deck,
       mode: "smart-review",
-      title: "Akıllı Tekrar",
-      description: "Son yanlışların ve zayıf konularından seçilen karışık tekrar oturumu.",
-      range: "Yanlış odaklı tekrar",
+      title: "AkÄ±llÄ± Tekrar",
+      description: "Son yanlÄ±ÅŸlarÄ±n ve zayÄ±f konularÄ±ndan seÃ§ilen karÄ±ÅŸÄ±k tekrar oturumu.",
+      range: "YanlÄ±ÅŸ odaklÄ± tekrar",
       allowCustom: false,
       allowShuffle: true,
       allowWrongButton: false,
@@ -1399,7 +1399,7 @@
 
     const returnToCurrentStudy =
       state.activeSectionId === section.id && !elements.studyOverlay.classList.contains("hidden");
-    elements.summaryStartButton.textContent = returnToCurrentStudy ? "Teste Dön" : "Bu Konuyu Çöz";
+    elements.summaryStartButton.textContent = returnToCurrentStudy ? "Teste DÃ¶n" : "Bu Konuyu Ã‡Ã¶z";
     if (!elements.summaryModal.open) {
       elements.summaryModal.showModal();
     }
@@ -1590,6 +1590,9 @@
     state.navTarget = nextTarget;
     document.querySelectorAll(".app-screen").forEach((screen) => {
       screen.classList.toggle("is-active", screen.id === nextTarget);
+      if (screen.id === nextTarget) {
+        screen.scrollTop = 0;
+      }
     });
     elements.bottomNav.querySelectorAll("[data-nav-target]").forEach((button) => {
       const isActive = button.dataset.navTarget === nextTarget;
@@ -1608,9 +1611,9 @@
     const resultValues = Object.values(persisted.results);
     const cards = [
       { label: "Toplam Soru", value: allQuestions.length },
-      { label: "Çözülen", value: resultValues.length },
-      { label: "Bekleyen Yanlış", value: resultValues.filter((item) => item.correct === false).length },
-      { label: "Özel Soru", value: allQuestions.filter((item) => item.isCustom).length },
+      { label: "Ã‡Ã¶zÃ¼len", value: resultValues.length },
+      { label: "Bekleyen YanlÄ±ÅŸ", value: resultValues.filter((item) => item.correct === false).length },
+      { label: "Ã–zel Soru", value: allQuestions.filter((item) => item.isCustom).length },
     ];
 
     elements.heroStats.innerHTML = cards
@@ -1635,15 +1638,15 @@
     const waitingWrongCount = getWrongDeck().length;
 
     const examCards = [
-      { label: "Son Skor", value: lastExam ? `%${lastExam.score}` : "Hazır" },
+      { label: "Son Skor", value: lastExam ? `%${lastExam.score}` : "HazÄ±r" },
       { label: "Deneme", value: persisted.examHistory.length || 0 },
       { label: "Ortalama", value: persisted.examHistory.length ? `%${averageScore}` : "-" },
     ];
 
     const reviewCards = [
       { label: "Tekrar Havuzu", value: `${reviewDeck.length} soru` },
-      { label: "Yanlış", value: waitingWrongCount },
-      { label: "Zayıf Konu", value: weakSection ? weakSection.title : "Dengeli" },
+      { label: "YanlÄ±ÅŸ", value: waitingWrongCount },
+      { label: "ZayÄ±f Konu", value: weakSection ? weakSection.title : "Dengeli" },
     ];
 
     elements.examStats.innerHTML = examCards
@@ -1777,7 +1780,7 @@
     elements.readerSectionSelect.innerHTML = sectionOptions
       .map(
         (section) =>
-          `<option value="${escapeHtml(section.id)}">${escapeHtml(section.title)}${section.pageRange ? ` · ${escapeHtml(section.pageRange)}` : ""}</option>`,
+          `<option value="${escapeHtml(section.id)}">${escapeHtml(section.title)}${section.pageRange ? ` Â· ${escapeHtml(section.pageRange)}` : ""}</option>`,
       )
       .join("");
 
@@ -1809,9 +1812,9 @@
 
     elements.readerPrevButton.disabled = currentIndex <= 0;
     elements.readerNextButton.disabled = currentIndex >= visiblePages.length - 1;
-    elements.readerPageStatus.textContent = `Sayfa ${currentIndex + 1} / ${visiblePages.length} · ${currentPage.locationLabel}`;
+    elements.readerPageStatus.textContent = `Sayfa ${currentIndex + 1} / ${visiblePages.length} Â· ${currentPage.locationLabel}`;
     elements.readerPageTitle.textContent = currentPage.title || currentPage.pageLabel || "Kitap sayfasi";
-    elements.readerPageInfo.textContent = `${currentPage.sectionLabel} · ${currentPage.wordCount || 0} kelime`;
+    elements.readerPageInfo.textContent = `${currentPage.sectionLabel} Â· ${currentPage.wordCount || 0} kelime`;
 
     const pageWindow = buildReaderPageWindow(visiblePages, currentIndex);
     elements.readerPageStrip.innerHTML = pageWindow
@@ -1925,7 +1928,7 @@
 
     elements.readerSection.classList.remove("hidden");
     if (elements.openReaderButton) {
-      elements.openReaderButton.textContent = state.readerPageId ? "Kaldigin Yerden Devam Et" : "Okumaya Gec";
+      elements.openReaderButton.textContent = state.readerPageId ? "Devam Et" : "Okumaya Basla";
     }
     applyReaderPreferences();
 
@@ -2224,7 +2227,7 @@
     });
 
     if (!filtered.length) {
-      elements.sectionGrid.innerHTML = '<div class="empty-state">Aramanla eşleşen konu bulunamadı.</div>';
+      elements.sectionGrid.innerHTML = '<div class="empty-state">Aramanla eÅŸleÅŸen konu bulunamadÄ±.</div>';
       return;
     }
 
@@ -2235,7 +2238,7 @@
         const summaryMarkup = getSummaryParts(section.summary).length
           ? `
             <details class="section-summary">
-              <summary>Bölüm Özeti</summary>
+              <summary>BÃ¶lÃ¼m Ã–zeti</summary>
               <div class="section-summary__body">${renderSummaryMarkup(section.summary)}</div>
             </details>
           `
@@ -2253,16 +2256,16 @@
             ${summaryMarkup}
             <div class="metric-list">
               <span class="metric">${metrics.total} ana test</span>
-              <span class="metric muted">${metrics.learningTotal} öğretici</span>
-              <span class="metric">${metrics.correct} doğru</span>
-              <span class="metric muted">${metrics.wrong} yanlış</span>
-              <span class="metric muted">${metrics.custom} özel</span>
+              <span class="metric muted">${metrics.learningTotal} Ã¶ÄŸretici</span>
+              <span class="metric">${metrics.correct} doÄŸru</span>
+              <span class="metric muted">${metrics.wrong} yanlÄ±ÅŸ</span>
+              <span class="metric muted">${metrics.custom} Ã¶zel</span>
             </div>
             <div class="card-bottom">
-              <button class="primary-button" data-open-section="${section.id}">Teste Başla</button>
-              ${hasLearningDeck ? `<button class="ghost-button" data-open-learning="${section.id}">Öğretici</button>` : ""}
-              <button class="ghost-button" data-open-summary="${section.id}">Özeti Aç</button>
-              <button class="ghost-button" data-open-wrong="${section.id}">Yanlışlar</button>
+              <button class="primary-button" data-open-section="${section.id}">Teste BaÅŸla</button>
+              ${hasLearningDeck ? `<button class="ghost-button" data-open-learning="${section.id}">Ã–ÄŸretici</button>` : ""}
+              <button class="ghost-button" data-open-summary="${section.id}">Ã–zeti AÃ§</button>
+              <button class="ghost-button" data-open-wrong="${section.id}">YanlÄ±ÅŸlar</button>
             </div>
           </article>
         `;
@@ -2358,39 +2361,39 @@
     const isExam = isExamMode();
     const reasonText =
       state.completionReason === "time"
-        ? "Süre doldu. Oturum mevcut cevaplarınla kapatıldı."
+        ? "SÃ¼re doldu. Oturum mevcut cevaplarÄ±nla kapatÄ±ldÄ±."
         : state.completionReason === "manual"
-          ? "Oturumu sen bitirdin. Mevcut cevaplar üzerinden özet oluşturuldu."
+          ? "Oturumu sen bitirdin. Mevcut cevaplar Ã¼zerinden Ã¶zet oluÅŸturuldu."
           : isExam
-            ? "Deneme tamamlandı. Şimdi sonuçlarını toplu olarak değerlendir."
-            : "Test tamamlandı. Sonuçların toplu olarak aşağıda listelendi.";
+            ? "Deneme tamamlandÄ±. Åimdi sonuÃ§larÄ±nÄ± toplu olarak deÄŸerlendir."
+            : "Test tamamlandÄ±. SonuÃ§larÄ±n toplu olarak aÅŸaÄŸÄ±da listelendi.";
 
     const breakdownText = breakdown.length
-      ? `En çok zorlandığın konu: ${breakdown[0].sectionTitle}. Diğer öne çıkan alanlar: ${breakdown
+      ? `En Ã§ok zorlandÄ±ÄŸÄ±n konu: ${breakdown[0].sectionTitle}. DiÄŸer Ã¶ne Ã§Ä±kan alanlar: ${breakdown
           .slice(1)
           .map((item) => item.sectionTitle)
           .join(", ") || "yok"}.`
-      : "Bu oturumda yanlış veya boş soru oluşmadı.";
+      : "Bu oturumda yanlÄ±ÅŸ veya boÅŸ soru oluÅŸmadÄ±.";
 
     const reviewMarkup = reviewItems.length
       ? `
         <div class="review-list">
-          <p class="eyebrow">Toplu Değerlendirme</p>
+          <p class="eyebrow">Toplu DeÄŸerlendirme</p>
           ${reviewItems
             .map((item) => {
               const userChoice = escapeHtml(getQuestionUserAnswerText(item.question, item.answer));
               const correctChoice = escapeHtml(getQuestionCorrectAnswerText(item.question));
-              const stateLabel = item.answer ? "Yanlış" : "Boş";
+              const stateLabel = item.answer ? "YanlÄ±ÅŸ" : "BoÅŸ";
               const stateClass = item.answer ? "wrong" : "blank";
               return `
                 <article class="review-card">
                   <div class="review-card__top">
                     <span class="tag ${stateClass}">${stateLabel}</span>
-                    <span class="metric muted">Soru ${item.order} · ${item.question.sectionTitle}</span>
+                    <span class="metric muted">Soru ${item.order} Â· ${item.question.sectionTitle}</span>
                   </div>
                   <p class="review-card__stem">${escapeHtml(item.question.stem)}</p>
-                  <p class="review-card__meta"><strong>Senin cevabın:</strong> ${userChoice}</p>
-                  <p class="review-card__meta"><strong>Doğru cevap:</strong> ${correctChoice}</p>
+                  <p class="review-card__meta"><strong>Senin cevabÄ±n:</strong> ${userChoice}</p>
+                  <p class="review-card__meta"><strong>DoÄŸru cevap:</strong> ${correctChoice}</p>
                   <p class="review-card__explanation">${escapeHtml(item.question.explanation)}</p>
                 </article>
               `;
@@ -2400,32 +2403,32 @@
       `
       : `
         <div class="review-list">
-          <p class="eyebrow">Toplu Değerlendirme</p>
-          <div class="summary-note">Bu oturumda yanlış veya boş soru kalmadı.</div>
+          <p class="eyebrow">Toplu DeÄŸerlendirme</p>
+          <div class="summary-note">Bu oturumda yanlÄ±ÅŸ veya boÅŸ soru kalmadÄ±.</div>
         </div>
       `;
 
     elements.sessionSummary.innerHTML = `
       <div>
-        <p class="eyebrow">${isExam ? "Deneme Özeti" : "Oturum Özeti"}</p>
+        <p class="eyebrow">${isExam ? "Deneme Ã–zeti" : "Oturum Ã–zeti"}</p>
         <h3>${state.sessionConfig?.title || "Oturum"}</h3>
         <p>${reasonText}</p>
       </div>
       <div class="summary-grid">
         <article class="summary-card">
-          <span>Doğru</span>
+          <span>DoÄŸru</span>
           <strong>${metrics.correct}</strong>
         </article>
         <article class="summary-card">
-          <span>Yanlış</span>
+          <span>YanlÄ±ÅŸ</span>
           <strong>${metrics.wrong}</strong>
         </article>
         <article class="summary-card">
-          <span>Boş</span>
+          <span>BoÅŸ</span>
           <strong>${metrics.skipped}</strong>
         </article>
         <article class="summary-card">
-          <span>Başarı</span>
+          <span>BaÅŸarÄ±</span>
           <strong>%${metrics.score}</strong>
         </article>
       </div>
@@ -2440,7 +2443,7 @@
     const metrics = getSessionMetrics();
 
     elements.studyRange.textContent = config?.range || "";
-    elements.studyTitle.textContent = config?.title || "Çalışma";
+    elements.studyTitle.textContent = config?.title || "Ã‡alÄ±ÅŸma";
     elements.studyDescription.textContent = config?.description || "";
     const summaryMarkup = renderSummaryMarkup(config?.summary);
     elements.studySummaryPanel.classList.toggle("hidden", !summaryMarkup);
@@ -2461,8 +2464,8 @@
       elements.questionCard.classList.add("hidden");
       elements.sessionSummary.classList.remove("hidden");
       elements.feedbackBox.className = "feedback hidden";
-      elements.progressLabel.textContent = "Oturum tamamlandı";
-      elements.progressSummary.textContent = `${metrics.correct} doğru · ${metrics.wrong} yanlış · ${metrics.skipped} boş`;
+      elements.progressLabel.textContent = "Oturum tamamlandÄ±";
+      elements.progressSummary.textContent = `${metrics.correct} doÄŸru Â· ${metrics.wrong} yanlÄ±ÅŸ Â· ${metrics.skipped} boÅŸ`;
       elements.prevButton.disabled = true;
       elements.checkButton.classList.add("hidden");
       elements.nextButton.disabled = false;
@@ -2477,8 +2480,8 @@
 
     if (!current) {
       elements.progressLabel.textContent = "Soru 0 / 0";
-      elements.progressSummary.textContent = "Hazır";
-      elements.questionStem.innerHTML = '<div class="empty-state">Bu oturum için gösterilecek soru yok.</div>';
+      elements.progressSummary.textContent = "HazÄ±r";
+      elements.questionStem.innerHTML = '<div class="empty-state">Bu oturum iÃ§in gÃ¶sterilecek soru yok.</div>';
       elements.optionList.innerHTML = "";
       elements.feedbackBox.className = "feedback hidden";
       elements.typeTag.textContent = "";
@@ -2492,10 +2495,10 @@
     }
 
     elements.progressLabel.textContent = `Soru ${state.index + 1} / ${state.deck.length}`;
-    elements.progressSummary.textContent = `${metrics.answered} cevap kaydedildi · sonuç test sonunda gösterilecek`;
+    elements.progressSummary.textContent = `${metrics.answered} cevap kaydedildi Â· sonuÃ§ test sonunda gÃ¶sterilecek`;
     elements.typeTag.textContent = getQuestionTypeLabel(current);
     elements.difficultyTag.textContent = current.difficulty;
-    elements.customTag.textContent = current.isCustom ? "Özel Soru" : current.sectionTitle;
+    elements.customTag.textContent = current.isCustom ? "Ã–zel Soru" : current.sectionTitle;
     elements.questionStem.textContent = current.stem;
     elements.prevButton.disabled = state.index <= 0;
     elements.questionCard.scrollTop = 0;
@@ -2570,7 +2573,7 @@
     elements.feedbackBox.textContent = "";
 
     if (!state.checked) {
-      elements.checkButton.textContent = "Cevabı Kaydet";
+      elements.checkButton.textContent = "CevabÄ± Kaydet";
       elements.checkButton.disabled = !hasPendingResponse(current);
       return;
     }
@@ -2744,7 +2747,7 @@
     const sectionQuestions = persisted.customQuestions[state.activeSectionId] || [];
     sectionQuestions.push({
       id: `${state.activeSectionId}-custom-${Date.now()}`,
-      difficulty: "Özel Soru",
+      difficulty: "Ã–zel Soru",
       ...payload,
       isCustom: true,
     });
@@ -2777,7 +2780,7 @@
     ready = false,
     showInstallButton = false,
     disableInstallButton = false,
-    buttonLabel = "Uygulamayı Yükle",
+    buttonLabel = "UygulamayÄ± YÃ¼kle",
   }) => {
     if (!elements.pwaNote || !elements.installAppButton) {
       return;
@@ -2797,21 +2800,21 @@
 
     if (isStandalone()) {
       updatePwaNote({
-        message: "Uygulama ana ekrandan çalışıyor.",
+        message: "Uygulama ana ekrandan Ã§alÄ±ÅŸÄ±yor.",
         ready: true,
       });
     }
 
     if (!window.isSecureContext || !/^https?:$/.test(window.location.protocol)) {
       updatePwaNote({
-        message: "PWA kurulumu için uygulamayı localhost veya HTTPS üzerinden aç.",
+        message: "PWA kurulumu iÃ§in uygulamayÄ± localhost veya HTTPS Ã¼zerinden aÃ§.",
       });
       return;
     }
 
     if (!("serviceWorker" in navigator)) {
       updatePwaNote({
-        message: "Bu tarayıcı PWA önbelleklemesini desteklemiyor.",
+        message: "Bu tarayÄ±cÄ± PWA Ã¶nbelleklemesini desteklemiyor.",
       });
       return;
     }
@@ -2821,12 +2824,12 @@
       await navigator.serviceWorker.ready;
       registration.update();
       updatePwaNote({
-        message: "Çevrimdışı kullanım hazır. Destekleyen tarayıcılarda ana ekrana ekleyebilirsin.",
+        message: "Ã‡evrimdÄ±ÅŸÄ± kullanÄ±m hazÄ±r. Destekleyen tarayÄ±cÄ±larda ana ekrana ekleyebilirsin.",
         ready: true,
       });
     } catch {
       updatePwaNote({
-        message: "PWA kurulumu tamamlanamadı. Uygulamayı localhost veya HTTPS üzerinden yeniden aç.",
+        message: "PWA kurulumu tamamlanamadÄ±. UygulamayÄ± localhost veya HTTPS Ã¼zerinden yeniden aÃ§.",
       });
     }
   };
@@ -3022,7 +3025,7 @@
   elements.installAppButton.addEventListener("click", async () => {
     if (isStandalone()) {
       updatePwaNote({
-        message: "Uygulama zaten ana ekrana eklenmiş durumda.",
+        message: "Uygulama zaten ana ekrana eklenmiÅŸ durumda.",
         ready: true,
       });
       return;
@@ -3030,7 +3033,7 @@
 
     if (!deferredInstallPrompt) {
       updatePwaNote({
-        message: "Tarayıcı menüsündeki ana ekrana ekle seçeneğini de kullanabilirsin.",
+        message: "TarayÄ±cÄ± menÃ¼sÃ¼ndeki ana ekrana ekle seÃ§eneÄŸini de kullanabilirsin.",
         ready: true,
       });
       return;
@@ -3043,8 +3046,8 @@
     updatePwaNote({
       message:
         choice.outcome === "accepted"
-          ? "Kurulum isteği alındı. Uygulamayı ana ekrandan açabilirsin."
-          : "Kurulum iptal edildi. İstersen tekrar deneyebilirsin.",
+          ? "Kurulum isteÄŸi alÄ±ndÄ±. UygulamayÄ± ana ekrandan aÃ§abilirsin."
+          : "Kurulum iptal edildi. Ä°stersen tekrar deneyebilirsin.",
       ready: choice.outcome === "accepted",
       showInstallButton: choice.outcome !== "accepted",
       disableInstallButton: false,
@@ -3055,7 +3058,7 @@
     event.preventDefault();
     deferredInstallPrompt = event;
     updatePwaNote({
-      message: "Kurulum hazır. Butona basarak uygulamayı ana ekrana ekleyebilirsin.",
+      message: "Kurulum hazÄ±r. Butona basarak uygulamayÄ± ana ekrana ekleyebilirsin.",
       ready: true,
       showInstallButton: true,
     });
@@ -3064,7 +3067,7 @@
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
     updatePwaNote({
-      message: "Uygulama başarıyla ana ekrana eklendi.",
+      message: "Uygulama baÅŸarÄ±yla ana ekrana eklendi.",
       ready: true,
     });
   });
@@ -3082,4 +3085,5 @@
   observeNavigationTargets();
   registerPwa();
 })();
+
 
