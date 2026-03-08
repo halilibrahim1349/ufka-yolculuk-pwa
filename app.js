@@ -66,6 +66,7 @@
     "yani",
   ]);
   const SECTION_CATEGORY_ORDER = ["all", "foundation", "faith", "guidance", "afterlife"];
+  const SCREEN_ORDER = ["homeScreen", "sectionsScreen", "bookScreen", "examScreen", "reviewScreen"];
   const SECTION_CATEGORY_META = {
     all: {
       id: "all",
@@ -327,10 +328,10 @@
     String(value || "")
       .toLocaleLowerCase("tr-TR")
       .replace(/ç/g, "c")
-      .replace(/g/g, "g")
-      .replace(/i/g, "i")
+      .replace(/ğ/g, "g")
+      .replace(/ı/g, "i")
       .replace(/ö/g, "o")
-      .replace(/s/g, "s")
+      .replace(/ş/g, "s")
       .replace(/ü/g, "u");
 
   const tokenizeSearchQuery = (value) =>
@@ -1223,6 +1224,62 @@
     );
   };
 
+  const bindScreenSwipe = (element) => {
+    if (!element) {
+      return;
+    }
+
+    let startX = 0;
+    let startY = 0;
+    let active = false;
+
+    element.addEventListener(
+      "touchstart",
+      (event) => {
+        if (
+          event.touches.length !== 1 ||
+          !elements.studyOverlay.classList.contains("hidden") ||
+          event.target?.closest(
+            "button, input, textarea, select, summary, .section-category-rail, .section-lane, .reader-page, .reader-page-strip, .reader-chapter-list, .book-view-switch, .question-card, dialog",
+          )
+        ) {
+          active = false;
+          return;
+        }
+
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        active = true;
+      },
+      { passive: true },
+    );
+
+    element.addEventListener(
+      "touchend",
+      (event) => {
+        if (!active || event.changedTouches.length !== 1) {
+          active = false;
+          return;
+        }
+
+        const deltaX = event.changedTouches[0].clientX - startX;
+        const deltaY = event.changedTouches[0].clientY - startY;
+        active = false;
+
+        if (Math.abs(deltaX) < 72 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) {
+          return;
+        }
+
+        if (deltaX > 0) {
+          goAdjacentScreen(-1);
+        } else {
+          goAdjacentScreen(1);
+        }
+      },
+      { passive: true },
+    );
+  };
+
   const isExamMode = () => state.activeMode === "exam-mini" || state.activeMode === "exam-full";
 
   const startSession = ({
@@ -1430,6 +1487,20 @@
     });
   };
 
+  const goAdjacentScreen = (offset) => {
+    const currentIndex = SCREEN_ORDER.indexOf(state.navTarget);
+    if (currentIndex < 0) {
+      return;
+    }
+
+    const nextIndex = clamp(currentIndex + offset, 0, SCREEN_ORDER.length - 1);
+    if (nextIndex === currentIndex) {
+      return;
+    }
+
+    setActiveNav(SCREEN_ORDER[nextIndex]);
+  };
+
   const initializeAppScreens = () => {
     if (!elements.appShell || document.getElementById("homeScreen")) {
       return;
@@ -1590,8 +1661,10 @@
     state.navTarget = nextTarget;
     document.querySelectorAll(".app-screen").forEach((screen) => {
       screen.classList.toggle("is-active", screen.id === nextTarget);
-      if (screen.id === nextTarget) {
-        screen.scrollTop = 0;
+      screen.setAttribute("aria-hidden", screen.id === nextTarget ? "false" : "true");
+      const scrollBody = screen.querySelector(".screen-body");
+      if (screen.id === nextTarget && scrollBody) {
+        scrollBody.scrollTop = 0;
       }
     });
     elements.bottomNav.querySelectorAll("[data-nav-target]").forEach((button) => {
@@ -2139,14 +2212,6 @@
     const metrics = getSectionMetrics(section);
     const hasLearningDeck = metrics.learningTotal > 0;
     const categoryMeta = getSectionCategoryMeta(section);
-    const summaryMarkup = getSummaryParts(section.summary).length
-      ? `
-        <details class="section-summary">
-          <summary>Bolum Ozeti</summary>
-          <div class="section-summary__body">${renderSummaryMarkup(section.summary)}</div>
-        </details>
-      `
-      : "";
 
     return `
       <article class="section-card section-card--lane">
@@ -2158,7 +2223,6 @@
           <span class="metric">${metrics.total + metrics.learningTotal} soru</span>
         </div>
         <p>${section.description}</p>
-        ${summaryMarkup}
         <div class="metric-list">
           <span class="metric">${categoryMeta.shortTitle}</span>
           <span class="metric">${metrics.total} ana test</span>
@@ -2221,9 +2285,10 @@
 
   const renderSectionsLegacy = () => {
     const sections = getSections();
+    const foldedQuery = foldForLookup(state.query);
     const filtered = sections.filter((section) => {
-      const haystack = `${section.title} ${section.description} ${section.pageRange} ${getSummaryText(section.summary)}`.toLowerCase();
-      return haystack.includes(state.query.toLowerCase());
+      const haystack = foldForLookup(`${section.title} ${section.description} ${section.pageRange} ${getSummaryText(section.summary)}`);
+      return haystack.includes(foldedQuery);
     });
 
     if (!filtered.length) {
@@ -2235,14 +2300,6 @@
       .map((section) => {
         const metrics = getSectionMetrics(section);
         const hasLearningDeck = metrics.learningTotal > 0;
-        const summaryMarkup = getSummaryParts(section.summary).length
-          ? `
-            <details class="section-summary">
-              <summary>Bolum Ozeti</summary>
-              <div class="section-summary__body">${renderSummaryMarkup(section.summary)}</div>
-            </details>
-          `
-          : "";
         return `
           <article class="section-card">
             <div class="card-top">
@@ -2253,7 +2310,6 @@
               <span class="metric">${metrics.total + metrics.learningTotal} soru</span>
             </div>
             <p>${section.description}</p>
-            ${summaryMarkup}
             <div class="metric-list">
               <span class="metric">${metrics.total} ana test</span>
               <span class="metric muted">${metrics.learningTotal} Ogretici</span>
@@ -2291,9 +2347,10 @@
 
   const renderSections = () => {
     const sections = getSections();
+    const foldedQuery = foldForLookup(state.query);
     const filtered = sections.filter((section) => {
-      const haystack = `${section.title} ${section.description} ${section.pageRange} ${getSummaryText(section.summary)}`.toLowerCase();
-      return haystack.includes(state.query.toLowerCase());
+      const haystack = foldForLookup(`${section.title} ${section.description} ${section.pageRange} ${getSummaryText(section.summary)}`);
+      return haystack.includes(foldedQuery);
     });
 
     renderSectionCategoryRail(filtered);
@@ -3020,6 +3077,22 @@
     button.addEventListener("click", () => {
       setActiveNav(button.dataset.navTarget);
     });
+  });
+
+  elements.appShell?.querySelectorAll("[data-open-screen]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setActiveNav(button.dataset.openScreen);
+    });
+  });
+
+  document.querySelectorAll("[data-book-view]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setBookView(button.dataset.bookView);
+    });
+  });
+
+  document.querySelectorAll(".app-screen").forEach((screen) => {
+    bindScreenSwipe(screen);
   });
 
   elements.installAppButton.addEventListener("click", async () => {

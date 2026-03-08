@@ -2,7 +2,7 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Ufka Yolculuk Sinav Hazirlik</title>
     <meta
       name="description"
@@ -48,249 +48,389 @@
   </head>
   <body>
     <main class="app-shell" id="appShell">
-      <header class="hero">
-        <p class="eyebrow">HTML tabanli mobil Calisma ekrani</p>
-        <h1>Ufka Yolculuk Sinav Hazirlik</h1>
-        <p class="hero-copy">
-          Konu baslangiclarina gore ayrilmis zor testler, uzun paragraf sorulari, dogrudan bilgi secmeleri ve kitabin tam metni
-          uzerinde arama modulu.
-        </p>
-        <div class="hero-actions">
-          <button class="ghost-button" id="wrongOnlyButton" type="button">Yanlislari Coz</button>
-          <button class="ghost-button" id="exportButton" type="button">Ozel Sorulari Disa Aktar</button>
-          <button class="ghost-button hidden" id="installAppButton" type="button">Uygulamayi Yukle</button>
+      <section class="app-screen is-active" id="homeScreen" aria-label="Ana ekran">
+        <header class="screen-head screen-head--hero">
+          <p class="eyebrow">Mobil calisma uygulamasi</p>
+          <h1>Ufka Yolculuk Sinav Hazirlik</h1>
+          <p>
+            Telefon odakli, ekran bazli ve sade calisma akisi. Konular, kitap ve testler ayri ekranlarda tutulur;
+            asagidaki alt menuden dogrudan gecis yaparsin.
+          </p>
+        </header>
+
+        <div class="screen-body screen-body--home">
+          <section class="hero">
+            <div class="hero-copy-block">
+              <p class="eyebrow">Hazirlik Merkezi</p>
+              <h2>Zor soru, konu bazli test, kitap okuyucu</h2>
+              <p class="hero-copy">
+                Uygulama mobilde tek sayfa gibi uzamaz. Her alan kendi ekraninda acilir; bolumler yatay seritlerle,
+                kitap okuyucu da ayri bir panel mantigiyla calisir.
+              </p>
+            </div>
+
+            <div class="hero-actions">
+              <button class="ghost-button" id="wrongOnlyButton" type="button">Yanlislari Coz</button>
+              <button class="ghost-button" id="exportButton" type="button">Ozel Sorulari Disa Aktar</button>
+              <button class="ghost-button hidden" id="installAppButton" type="button">Uygulamayi Yukle</button>
+            </div>
+
+            <p class="pwa-note" id="pwaNote">PWA kurulumu icin uygulamayi localhost veya HTTPS uzerinden ac.</p>
+
+            <div class="stat-rail" id="heroStats"></div>
+          </section>
+
+          <section class="feature-card feature-card--compact">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Hizli Gecis</p>
+                <h2>Ekranlar</h2>
+                <p>Asagidaki kartlardan istedigin ana ekrana tek dokunusla gecebilirsin.</p>
+              </div>
+            </div>
+
+            <div class="shortcut-rail">
+              <button class="shortcut-card" data-open-screen="sectionsScreen" type="button">
+                <span class="shortcut-card__label">Bolumler</span>
+                <strong>Konu kartlari ve ozetler</strong>
+              </button>
+              <button class="shortcut-card" data-open-screen="bookScreen" type="button">
+                <span class="shortcut-card__label">Kitap</span>
+                <strong>Okuyucu, arama ve soru sorma</strong>
+              </button>
+              <button class="shortcut-card" data-open-screen="examScreen" type="button">
+                <span class="shortcut-card__label">Deneme</span>
+                <strong>Sureli karisik oturumlar</strong>
+              </button>
+              <button class="shortcut-card" data-open-screen="reviewScreen" type="button">
+                <span class="shortcut-card__label">Tekrar</span>
+                <strong>Yanlis ve zayif konu odakli</strong>
+              </button>
+            </div>
+          </section>
         </div>
-        <p class="pwa-note" id="pwaNote">PWA kurulumu icin uygulamayi localhost veya HTTPS uzerinden ac.</p>
-        <div class="stat-grid" id="heroStats"></div>
-      </header>
-
-      <section class="toolbar">
-        <label class="search-box" for="searchInput">
-          <span>Konu kartlarini filtrele</span>
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Bolum, konu veya ozet ara"
-            autocomplete="off"
-          />
-        </label>
       </section>
 
-      <section class="feature-card section-browser">
-        <div class="section-browser__head">
-          <div>
-            <p class="eyebrow">Konu Katmanlari</p>
-            <h2>Mobil Kategori Akisi</h2>
-            <p id="sectionCategorySummary">Konular, telefonda daha rahat gezilebilsin diye katmanli kategori bloklarina ayrildi.</p>
-          </div>
-          <div class="section-category-rail" id="sectionCategoryRail"></div>
+      <section class="app-screen" id="sectionsScreen" aria-label="Bolumler">
+        <header class="screen-head">
+          <p class="eyebrow">Bolumler</p>
+          <h2>Konu katmanlari</h2>
+          <p>
+            Bolum kartlari mobilde daha rahat kullanilsin diye kategori bazli yatay seritler halinde sunulur. Ana
+            test, ogretici ve ozet erisimleri ayni kartta yer alir.
+          </p>
+        </header>
+
+        <div class="screen-body screen-body--sections">
+          <section class="toolbar feature-card feature-card--compact">
+            <label class="search-box" for="searchInput">
+              <span>Konu kartlarini filtrele</span>
+              <input id="searchInput" type="search" placeholder="Bolum, kavram veya ozet ara" autocomplete="off" />
+            </label>
+          </section>
+
+          <section class="feature-card section-browser">
+            <div class="section-browser__head">
+              <div>
+                <p class="eyebrow">Kategori seritleri</p>
+                <h2>Yatay bolum akisi</h2>
+                <p id="sectionCategorySummary">
+                  Konular, telefonda rahat gezilebilsin diye katmanli kategori bloklarina ayrildi.
+                </p>
+              </div>
+              <div class="section-category-rail" id="sectionCategoryRail"></div>
+            </div>
+
+            <section class="section-grid section-layers" id="sectionGrid"></section>
+          </section>
         </div>
-        <section class="section-grid section-layers" id="sectionGrid"></section>
       </section>
 
-      <section class="feature-grid">
-        <article class="feature-card" id="examSection">
-          <div>
-            <p class="eyebrow">Deneme Modu</p>
-            <h2>Karisik Denemeler</h2>
-            <p>
-              Konular arasi dengeli dagitilan sorularla sureli deneme Coz. Sonuc ekraninda dogrularini, yanlislarini ve
-              boslarini toplu gor.
-            </p>
-          </div>
-          <div class="feature-metric-grid" id="examStats"></div>
-          <div class="feature-actions">
-            <button class="primary-button" id="startMiniExamButton" type="button">30 Soruluk Deneme</button>
-            <button class="ghost-button" id="startFullExamButton" type="button">50 Soruluk Deneme</button>
-          </div>
-        </article>
+      <section class="app-screen" id="bookScreen" aria-label="Kitap">
+        <header class="screen-head">
+          <p class="eyebrow">Kitap</p>
+          <h2>Kitap okuyucu</h2>
+          <p>
+            Okuma, arama ve soru sorma ayri panellerde tutulur. Okuma paneli onceliklidir; metin alanina daha hizli
+            ulasilir ve sayfalar yatay gecis mantigiyla ilerler.
+          </p>
+        </header>
 
-        <article class="feature-card" id="reviewSection">
-          <div>
-            <p class="eyebrow">Akilli Tekrar</p>
-            <h2>Yanlislardan Otomatik Tekrar</h2>
-            <p>
-              Son yanlislarin, eksik biraktigin zor sorular ve en cok hata yaptigin konular tek oturumda karisik olarak
-              gelir.
-            </p>
-          </div>
-          <div class="feature-metric-grid" id="reviewStats"></div>
-          <div class="feature-actions">
-            <button class="primary-button" id="startAutoReviewButton" type="button">Tekrari Baslat</button>
-            <button class="ghost-button" id="startWrongOnlyButton" type="button">Sadece Yanlislar</button>
-          </div>
-        </article>
+        <div class="screen-body screen-body--book">
+          <section class="book-workspace">
+            <div class="book-view-switch" role="tablist" aria-label="Kitap araclari">
+              <button class="book-view-button is-active" type="button" role="tab" aria-selected="true" data-book-view="read">
+                Oku
+              </button>
+              <button class="book-view-button" type="button" role="tab" aria-selected="false" data-book-view="search">
+                Ara
+              </button>
+              <button class="book-view-button" type="button" role="tab" aria-selected="false" data-book-view="ask">
+                Sor
+              </button>
+            </div>
+
+            <section class="book-panel is-active" data-book-panel="read">
+              <section
+                class="feature-card reader-section"
+                id="readerSection"
+                data-reader-theme="paper"
+                data-reader-density="relaxed"
+                data-reader-mode="standard"
+              >
+                <div class="reader-shell">
+                  <div class="reader-section__intro">
+                    <div>
+                      <p class="eyebrow">Okuma paneli</p>
+                      <h2>Kitabi oku</h2>
+                    </div>
+                    <div class="feature-actions">
+                      <button class="primary-button" id="openReaderButton" type="button">Okumaya Basla</button>
+                    </div>
+                  </div>
+
+                  <div class="reader-toolbar">
+                    <label class="search-box" for="readerSectionSelect">
+                      <span>Bolum</span>
+                      <select id="readerSectionSelect"></select>
+                    </label>
+                  </div>
+
+                  <article class="reader-pane reader-pane--solo">
+                    <div class="reader-pane__chrome">
+                      <div class="reader-pane__topline">
+                        <p class="reader-page-status" id="readerPageStatus"></p>
+                        <div class="reader-nav">
+                          <button class="ghost-button" id="readerPrevButton" type="button">Onceki</button>
+                          <button class="ghost-button" id="readerNextButton" type="button">Sonraki</button>
+                        </div>
+                      </div>
+
+                      <div class="reader-pane__head">
+                        <div>
+                          <h3 id="readerPageTitle">Kitap sayfasi</h3>
+                          <p class="reader-page-info" id="readerPageInfo"></p>
+                        </div>
+                        <div class="feature-actions reader-pane__actions" id="readerPageActions"></div>
+                      </div>
+
+                      <div class="reader-meta reader-meta--compact" id="readerMeta"></div>
+
+                      <div class="reader-progress">
+                        <div class="reader-progress__track">
+                          <span class="reader-progress__fill" id="readerProgressFill"></span>
+                        </div>
+                        <p class="reader-progress__label" id="readerProgressLabel"></p>
+                        <div class="reader-page-strip" id="readerPageStrip"></div>
+                        <p class="swipe-hint" id="readerSwipeHint">Sayfalar arasinda saga sola kaydirarak gecebilirsin.</p>
+                      </div>
+                    </div>
+
+                    <div class="reader-page" id="readerPageSurface">
+                      <div class="reader-empty-state hidden" id="readerEmptyState"></div>
+                      <div class="reader-text" id="readerText"></div>
+                      <div class="reader-page-footer" id="readerPageFooter"></div>
+                    </div>
+                  </article>
+
+                  <div class="reader-drawers">
+                    <details class="reader-drawer">
+                      <summary>Arama ve ayarlar</summary>
+                      <div class="reader-appearance">
+                        <label class="search-box" for="readerFilterInput">
+                          <span>Metinde filtrele</span>
+                          <input
+                            id="readerFilterInput"
+                            type="search"
+                            placeholder="Kavram, ifade veya anahtar kelime yaz"
+                            autocomplete="off"
+                          />
+                        </label>
+
+                        <div class="feature-actions reader-toolbar__actions">
+                          <button class="ghost-button" id="clearReaderFilterButton" type="button">Temizle</button>
+                        </div>
+
+                        <div class="reader-appearance__group">
+                          <span class="reader-appearance__label">Tema</span>
+                          <div class="reader-toggle-group" id="readerThemeControls">
+                            <button class="reader-toggle is-active" data-reader-theme="paper" type="button">Kagit</button>
+                            <button class="reader-toggle" data-reader-theme="sepia" type="button">Sepya</button>
+                            <button class="reader-toggle" data-reader-theme="night" type="button">Gece</button>
+                          </div>
+                        </div>
+
+                        <div class="reader-appearance__group">
+                          <span class="reader-appearance__label">Yazi boyutu</span>
+                          <div class="reader-stepper">
+                            <button class="reader-stepper__button" id="readerFontDecreaseButton" type="button">A-</button>
+                            <strong class="reader-stepper__value" id="readerFontValue">100%</strong>
+                            <button class="reader-stepper__button" id="readerFontIncreaseButton" type="button">A+</button>
+                          </div>
+                        </div>
+
+                        <div class="reader-appearance__group">
+                          <span class="reader-appearance__label">Satir araligi</span>
+                          <div class="reader-toggle-group" id="readerDensityControls">
+                            <button class="reader-toggle" data-reader-density="compact" type="button">Siki</button>
+                            <button class="reader-toggle is-active" data-reader-density="relaxed" type="button">Dengeli</button>
+                            <button class="reader-toggle" data-reader-density="airy" type="button">Ferah</button>
+                          </div>
+                        </div>
+
+                        <div class="reader-appearance__group">
+                          <span class="reader-appearance__label">Okuma modu</span>
+                          <div class="reader-toggle-group" id="readerModeControls">
+                            <button class="reader-toggle is-active" data-reader-mode="standard" type="button">Standart</button>
+                            <button class="reader-toggle" data-reader-mode="focus" type="button">Odak</button>
+                          </div>
+                        </div>
+                      </div>
+                    </details>
+
+                    <details class="reader-drawer">
+                      <summary>Bolum listesi</summary>
+                      <div class="reader-chapter-list" id="readerChapterList"></div>
+                    </details>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <section class="book-panel" data-book-panel="search" hidden>
+              <article class="feature-card knowledge-card">
+                <div>
+                  <p class="eyebrow">Kitapta Ara</p>
+                  <h2>Metin icinde arama</h2>
+                  <p>Kitabin gomulu metni icinde anahtar kelime ara; ilgili bolumu, sayfayi ve alintiyi getir.</p>
+                </div>
+
+                <label class="search-box" for="bookSearchInput">
+                  <span>Kitap aramasi</span>
+                  <input
+                    id="bookSearchInput"
+                    type="search"
+                    placeholder="Ornek: saglam inanc, vahiy, kader, tevekkul"
+                    autocomplete="off"
+                  />
+                </label>
+
+                <div class="feature-actions">
+                  <button class="ghost-button" id="clearBookSearchButton" type="button">Aramayi Temizle</button>
+                </div>
+
+                <div class="book-search-results" id="bookSearchResults"></div>
+              </article>
+            </section>
+
+            <section class="book-panel" data-book-panel="ask" hidden>
+              <article class="feature-card knowledge-card">
+                <div>
+                  <p class="eyebrow">Kitaba Sor</p>
+                  <h2>Metinden cevap getir</h2>
+                  <p>
+                    Sorunu yaz. Uygulama kitabin ilgili kisimlarini tarayip kisa cevap, dayanak alinti ve gidilecek
+                    bolumu birlikte gosterir.
+                  </p>
+                </div>
+
+                <label class="search-box" for="askBookInput">
+                  <span>Sorun</span>
+                  <textarea id="askBookInput" rows="4" placeholder="Ornek: Kitaba gore saglam inanc nasil kurulur?"></textarea>
+                </label>
+
+                <div class="feature-actions">
+                  <button class="primary-button" id="askBookButton" type="button">Soruyu Cevapla</button>
+                  <button class="ghost-button" id="clearAskBookButton" type="button">Temizle</button>
+                </div>
+
+                <section class="qa-answer hidden" id="qaAnswer"></section>
+              </article>
+            </section>
+          </section>
+        </div>
       </section>
 
-      <section class="knowledge-tools">
-        <article class="feature-card knowledge-card">
-          <div>
-            <p class="eyebrow">Kitapta Ara</p>
-            <h2>Metin Icinde Arama</h2>
-            <p>
-              Kitabin OCR metni uygulama icine gomulu. Kavram, ifade veya konu arat; en ilgili bolumleri, sayfalari ve
-              alintilari hemen getir.
-            </p>
-          </div>
-          <label class="search-box" for="bookSearchInput">
-            <span>Kitap aramasi</span>
-            <input
-              id="bookSearchInput"
-              type="search"
-              placeholder="Ornek: saglam inanc, vahiy, kader, tevekkul"
-              autocomplete="off"
-            />
-          </label>
-          <div class="feature-actions">
-            <button class="ghost-button" id="clearBookSearchButton" type="button">Aramayi Temizle</button>
-          </div>
-          <div class="book-search-results" id="bookSearchResults"></div>
-        </article>
+      <section class="app-screen" id="examScreen" aria-label="Deneme">
+        <header class="screen-head">
+          <p class="eyebrow">Deneme</p>
+          <h2>Sureli karisik deneme</h2>
+          <p>
+            Deneme ekrani yalnizca karisik oturumlar icin ayri tutulur. Telefon ekraninda tek kart mantigiyla temiz
+            calisir.
+          </p>
+        </header>
 
-        <article class="feature-card knowledge-card">
-          <div>
-            <p class="eyebrow">Kitaba Sor</p>
-            <h2>Metinden Cevap Getir</h2>
-            <p>
-              Sorunu yaz. Uygulama kitabin ilgili kisimlarini tarayip kisa cevap, dayanak alinti ve gidilecek bolumu birlikte
-              gosterir.
-            </p>
-          </div>
-          <label class="search-box" for="askBookInput">
-            <span>Sorun</span>
-            <textarea
-              id="askBookInput"
-              rows="4"
-              placeholder="Ornek: Kitaba gore saglam inanc nasil kurulur?"
-            ></textarea>
-          </label>
-          <div class="feature-actions">
-            <button class="primary-button" id="askBookButton" type="button">Soruyu Cevapla</button>
-            <button class="ghost-button" id="clearAskBookButton" type="button">Temizle</button>
-          </div>
-          <section class="qa-answer hidden" id="qaAnswer"></section>
-        </article>
-      </section>
-
-      <section class="feature-card reader-section" id="readerSection" data-reader-theme="paper" data-reader-density="relaxed" data-reader-mode="standard">
-        <div class="reader-shell">
-          <div class="reader-section__intro">
+        <div class="screen-body screen-body--single">
+          <article class="feature-card" id="examSection">
             <div>
-              <p class="eyebrow">Kitap Okuyucu</p>
-              <h2>Sade Okuma Ekrani</h2>
-              <p>Bolum sec, sayfalar arasinda gec ve metni temiz bir ekranda oku.</p>
+              <p class="eyebrow">Deneme Modu</p>
+              <h2>Karisik denemeler</h2>
+              <p>
+                Konular arasi dengeli dagitilan sorularla sureli deneme cozersin. Sonuc ekraninda dogru, yanlis ve bos
+                dagilimi toplu olarak gelir.
+              </p>
             </div>
+            <div class="feature-metric-grid" id="examStats"></div>
             <div class="feature-actions">
-              <button class="primary-button" id="openReaderButton" type="button">Okumaya Gec</button>
+              <button class="primary-button" id="startMiniExamButton" type="button">30 Soruluk Deneme</button>
+              <button class="ghost-button" id="startFullExamButton" type="button">50 Soruluk Deneme</button>
             </div>
-          </div>
-
-          <div class="reader-toolbar">
-            <label class="search-box" for="readerSectionSelect">
-              <span>Bolum</span>
-              <select id="readerSectionSelect"></select>
-            </label>
-            <label class="search-box" for="readerFilterInput">
-              <span>Metinde filtrele</span>
-              <input
-                id="readerFilterInput"
-                type="search"
-                placeholder="Kavram, ifade veya anahtar kelime yaz"
-                autocomplete="off"
-              />
-            </label>
-            <div class="feature-actions reader-toolbar__actions">
-              <button class="ghost-button" id="clearReaderFilterButton" type="button">Aramayi Temizle</button>
-            </div>
-          </div>
-
-          <details class="reader-drawer">
-            <summary>Okuma Ayarlari</summary>
-            <div class="reader-appearance">
-              <div class="reader-appearance__group">
-                <span class="reader-appearance__label">Tema</span>
-                <div class="reader-toggle-group" id="readerThemeControls">
-                  <button class="reader-toggle is-active" data-reader-theme="paper" type="button">Kagit</button>
-                  <button class="reader-toggle" data-reader-theme="sepia" type="button">Sepya</button>
-                  <button class="reader-toggle" data-reader-theme="night" type="button">Gece</button>
-                </div>
-              </div>
-              <div class="reader-appearance__group">
-                <span class="reader-appearance__label">Yazi Boyutu</span>
-                <div class="reader-stepper">
-                  <button class="reader-stepper__button" id="readerFontDecreaseButton" type="button">A-</button>
-                  <strong class="reader-stepper__value" id="readerFontValue">100%</strong>
-                  <button class="reader-stepper__button" id="readerFontIncreaseButton" type="button">A+</button>
-                </div>
-              </div>
-              <div class="reader-appearance__group">
-                <span class="reader-appearance__label">Satir Araligi</span>
-                <div class="reader-toggle-group" id="readerDensityControls">
-                  <button class="reader-toggle" data-reader-density="compact" type="button">Siki</button>
-                  <button class="reader-toggle is-active" data-reader-density="relaxed" type="button">Dengeli</button>
-                  <button class="reader-toggle" data-reader-density="airy" type="button">Ferah</button>
-                </div>
-              </div>
-              <div class="reader-appearance__group">
-                <span class="reader-appearance__label">Okuma Modu</span>
-                <div class="reader-toggle-group" id="readerModeControls">
-                  <button class="reader-toggle is-active" data-reader-mode="standard" type="button">Standart</button>
-                  <button class="reader-toggle" data-reader-mode="focus" type="button">Odak</button>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details class="reader-drawer">
-            <summary>Bolum Listesi</summary>
-            <div class="reader-chapter-list" id="readerChapterList"></div>
-          </details>
-
-          <article class="reader-pane reader-pane--solo">
-            <div class="reader-pane__chrome">
-              <div class="reader-pane__topline">
-                <p class="reader-page-status" id="readerPageStatus"></p>
-                <div class="reader-nav">
-                  <button class="ghost-button" id="readerPrevButton" type="button">Onceki</button>
-                  <button class="ghost-button" id="readerNextButton" type="button">Sonraki</button>
-                </div>
-              </div>
-              <div class="reader-pane__head">
-                  <div>
-                    <p class="eyebrow">Okuma Ekrani</p>
-                    <h3 id="readerPageTitle">Kitap sayfasi</h3>
-                    <p class="reader-page-info" id="readerPageInfo"></p>
-                  </div>
-                  <div class="feature-actions reader-pane__actions" id="readerPageActions"></div>
-                </div>
-                <div class="reader-meta reader-meta--compact" id="readerMeta"></div>
-                <div class="reader-progress">
-                  <div class="reader-progress__track">
-                    <span class="reader-progress__fill" id="readerProgressFill"></span>
-                  </div>
-                  <p class="reader-progress__label" id="readerProgressLabel"></p>
-                  <div class="reader-page-strip" id="readerPageStrip"></div>
-                  <p class="swipe-hint" id="readerSwipeHint">Sayfalar arasinda saga sola kaydirarak gecebilirsin.</p>
-                </div>
-              </div>
-
-              <div class="reader-page" id="readerPageSurface">
-                <div class="reader-empty-state hidden" id="readerEmptyState"></div>
-                <div class="reader-text" id="readerText"></div>
-                <div class="reader-page-footer" id="readerPageFooter"></div>
-              </div>
-            </article>
+          </article>
         </div>
       </section>
 
+      <section class="app-screen" id="reviewScreen" aria-label="Tekrar">
+        <header class="screen-head">
+          <p class="eyebrow">Tekrar</p>
+          <h2>Yanlis odakli tekrar</h2>
+          <p>
+            Yanlislar, zayif alanlar ve bos birakilan sorular tek ekranda toplanir. Bu alan da ayri bir sekme olarak
+            acilir.
+          </p>
+        </header>
+
+        <div class="screen-body screen-body--single">
+          <article class="feature-card" id="reviewSection">
+            <div>
+              <p class="eyebrow">Akilli Tekrar</p>
+              <h2>Yanlislardan otomatik tekrar</h2>
+              <p>
+                Son yanlislarin, eksik biraktigin zor sorular ve en cok hata yaptigin konular tek oturumda karisik
+                gelir.
+              </p>
+            </div>
+            <div class="feature-metric-grid" id="reviewStats"></div>
+            <div class="feature-actions">
+              <button class="primary-button" id="startAutoReviewButton" type="button">Tekrari Baslat</button>
+              <button class="ghost-button" id="startWrongOnlyButton" type="button">Sadece Yanlislar</button>
+            </div>
+          </article>
+        </div>
+      </section>
     </main>
 
     <nav class="bottom-nav" id="bottomNav" aria-label="Alt gezinme">
-      <button class="bottom-nav__item is-active" data-nav-target="homeScreen" type="button">Ana</button>
-      <button class="bottom-nav__item" data-nav-target="sectionsScreen" type="button">Bolum</button>
-      <button class="bottom-nav__item" data-nav-target="bookScreen" type="button">Kitap</button>
-      <button class="bottom-nav__item" data-nav-target="examScreen" type="button">Deneme</button>
-      <button class="bottom-nav__item" data-nav-target="reviewScreen" type="button">Tekrar</button>
+      <button class="bottom-nav__item is-active" data-nav-target="homeScreen" type="button">
+        <strong>Ana</strong>
+        <span>Genel</span>
+      </button>
+      <button class="bottom-nav__item" data-nav-target="sectionsScreen" type="button">
+        <strong>Bolum</strong>
+        <span>Konular</span>
+      </button>
+      <button class="bottom-nav__item" data-nav-target="bookScreen" type="button">
+        <strong>Kitap</strong>
+        <span>Okuyucu</span>
+      </button>
+      <button class="bottom-nav__item" data-nav-target="examScreen" type="button">
+        <strong>Deneme</strong>
+        <span>Sureli</span>
+      </button>
+      <button class="bottom-nav__item" data-nav-target="reviewScreen" type="button">
+        <strong>Tekrar</strong>
+        <span>Yanlislar</span>
+      </button>
     </nav>
 
     <section class="study-overlay hidden" id="studyOverlay" aria-hidden="true">
@@ -322,6 +462,7 @@
         </div>
 
         <p class="swipe-hint swipe-hint--study" id="studySwipeHint">Sorular arasinda saga sola kaydirarak gecebilirsin.</p>
+
         <article class="question-card" id="questionCard">
           <div class="question-tags">
             <span class="tag" id="typeTag"></span>
