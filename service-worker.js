@@ -1,8 +1,9 @@
-const CACHE_NAME = "ufka-yolculuk-pwa-v12";
+const CACHE_NAME = "ufka-yolculuk-pwa-v13";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
+  "./assets/social-preview.png",
   "./app.js",
   "./manifest.webmanifest",
   "./data/quiz-data.js",

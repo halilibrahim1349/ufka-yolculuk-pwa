@@ -10,6 +10,15 @@
   "theme_color": "#0f5c5c",
   "background_color": "#f8f1e4",
   "categories": ["education", "books", "productivity"],
+  "screenshots": [
+    {
+      "src": "./assets/social-preview.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ufka Yolculuk PWA tanitim goruntusu"
+    }
+  ],
   "icons": [
     {
       "src": "./assets/pwa/icon-192.png",
