@@ -115,17 +115,25 @@ summary:focus-visible {
   gap: 14px;
   padding: var(--safe-top) var(--safe-right) 0 var(--safe-left);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transform: translateX(22px);
+  contain: layout paint;
   transition:
     opacity 180ms ease,
-    transform 240ms ease;
+    transform 240ms ease,
+    visibility 0ms linear 240ms;
 }
 
 .app-screen.is-active {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
   transform: translateX(0);
+  transition:
+    opacity 180ms ease,
+    transform 240ms ease,
+    visibility 0ms linear 0ms;
 }
 
 .screen-head {
@@ -1120,11 +1128,13 @@ summary:focus-visible {
   width: min(960px, 100%);
   height: 100%;
   margin: 0 auto;
-  padding: 16px;
-  display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  padding: 16px 16px calc(16px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
   gap: 14px;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-bottom: 92px;
   background: linear-gradient(180deg, rgba(255, 251, 244, 0.98), rgba(247, 241, 231, 0.96));
 }
 
@@ -1133,6 +1143,11 @@ summary:focus-visible {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding-bottom: 4px;
+  background: linear-gradient(180deg, rgba(247, 241, 231, 0.98), rgba(247, 241, 231, 0.9));
 }
 
 .progress-strip {
@@ -1148,9 +1163,9 @@ summary:focus-visible {
 
 .question-card,
 .session-summary {
-  min-height: 0;
+  min-height: auto;
   padding: 18px;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .question-card {
@@ -1245,6 +1260,15 @@ summary:focus-visible {
   display: grid;
   gap: 16px;
   background: linear-gradient(145deg, rgba(255, 250, 243, 0.96), rgba(230, 243, 239, 0.9));
+}
+
+.study-footer {
+  position: sticky;
+  bottom: calc(-1 * var(--safe-bottom));
+  z-index: 4;
+  margin-top: auto;
+  padding: 12px 0 4px;
+  background: linear-gradient(180deg, rgba(247, 241, 231, 0), rgba(247, 241, 231, 0.96) 32%, rgba(247, 241, 231, 0.99) 100%);
 }
 
 .summary-grid {
@@ -1421,12 +1445,41 @@ mark {
     grid-template-columns: 1fr;
   }
 
+  .study-actions {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: start;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .study-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .study-meta p:last-child {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .swipe-hint--study {
+    display: none;
+  }
+
+  .progress-strip {
+    padding: 12px;
+  }
+
   .reader-nav,
   .study-footer,
   .progress-tools,
   .hero-actions,
-  .feature-actions,
-  .study-actions {
+  .feature-actions {
     gap: 8px;
   }
 

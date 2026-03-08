@@ -111,14 +111,6 @@
     s9: "afterlife",
   };
 
-  const progressStrip = document.querySelector(".progress-strip");
-  if (progressStrip && !document.getElementById("studySummaryPanel")) {
-    progressStrip.insertAdjacentHTML(
-      "afterend",
-      `<section class="study-summary-panel hidden" id="studySummaryPanel"><p class="eyebrow">Bolum Ozeti</p><div class="study-summary-copy" id="studySummaryCopy"></div></section>`,
-    );
-  }
-
   const elements = {
     appShell: document.getElementById("appShell"),
     heroStats: document.getElementById("heroStats"),
@@ -2555,9 +2547,8 @@
     elements.studyRange.textContent = config?.range || "";
     elements.studyTitle.textContent = config?.title || "Calisma";
     elements.studyDescription.textContent = config?.description || "";
-    const summaryMarkup = renderSummaryMarkup(config?.summary);
-    elements.studySummaryPanel.classList.toggle("hidden", !summaryMarkup);
-    elements.studySummaryCopy.innerHTML = summaryMarkup;
+    elements.studySummaryPanel.classList.add("hidden");
+    elements.studySummaryCopy.innerHTML = "";
     elements.openSummaryButton.classList.toggle("hidden", !(state.activeSectionId && hasSummary(config?.summary)));
     elements.openAddModal.classList.toggle("hidden", !config?.allowCustom);
     elements.shuffleButton.classList.toggle("hidden", !config?.allowShuffle);
@@ -2611,7 +2602,9 @@
     elements.customTag.textContent = current.isCustom ? "Ozel Soru" : current.sectionTitle;
     elements.questionStem.textContent = current.stem;
     elements.prevButton.disabled = state.index <= 0;
-    elements.questionCard.scrollTop = 0;
+    if (elements.studyPanel) {
+      elements.studyPanel.scrollTop = 0;
+    }
 
     const finishing = state.index >= state.deck.length - 1 && config?.finite;
     if (!state.checked) {
@@ -2948,6 +2941,39 @@
     return;
   };
 
+  const applyDebugStateFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const screen = params.get("screen");
+    const bookView = params.get("bookView");
+    const readerSection = params.get("readerSection");
+    const readerQuery = params.get("readerQuery");
+    const openSectionId = params.get("openStudy");
+    const requestedMode = params.get("studyMode");
+    const studyMode = ["section", "section-learning", "section-memorization", "wrong-section"].includes(requestedMode)
+      ? requestedMode
+      : "section";
+
+    if (screen) {
+      setActiveNav(screen);
+    }
+
+    if (bookView) {
+      setBookView(bookView);
+    }
+
+    if (readerSection || readerQuery) {
+      openReader({
+        sectionId: readerSection || state.readerSectionId,
+        query: typeof readerQuery === "string" ? readerQuery : state.readerQuery,
+        scroll: false,
+      });
+    }
+
+    if (openSectionId) {
+      openStudy(openSectionId, studyMode);
+    }
+  };
+
   elements.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value;
     renderSections();
@@ -3208,6 +3234,7 @@
   clearQaAnswer();
   renderSections();
   setActiveNav((window.location.hash || "").replace("#", "") || "homeScreen");
+  applyDebugStateFromUrl();
   observeNavigationTargets();
   registerPwa();
 })();
