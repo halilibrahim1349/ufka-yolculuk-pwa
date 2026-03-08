@@ -64,6 +64,30 @@
         <div class="stat-grid" id="heroStats"></div>
       </header>
 
+      <section class="toolbar">
+        <label class="search-box" for="searchInput">
+          <span>Konu kartlarini filtrele</span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Bolum, konu veya ozet ara"
+            autocomplete="off"
+          />
+        </label>
+      </section>
+
+      <section class="feature-card section-browser">
+        <div class="section-browser__head">
+          <div>
+            <p class="eyebrow">Konu Katmanlari</p>
+            <h2>Mobil Kategori Akisi</h2>
+            <p id="sectionCategorySummary">Konular, telefonda daha rahat gezilebilsin diye katmanli kategori bloklarina ayrildi.</p>
+          </div>
+          <div class="section-category-rail" id="sectionCategoryRail"></div>
+        </div>
+        <section class="section-grid section-layers" id="sectionGrid"></section>
+      </section>
+
       <section class="feature-grid">
         <article class="feature-card" id="examSection">
           <div>
@@ -96,18 +120,6 @@
             <button class="ghost-button" id="startWrongOnlyButton" type="button">Sadece Yanlışlar</button>
           </div>
         </article>
-      </section>
-
-      <section class="toolbar">
-        <label class="search-box" for="searchInput">
-          <span>Konu kartlarini filtrele</span>
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Bolum, konu veya ozet ara"
-            autocomplete="off"
-          />
-        </label>
       </section>
 
       <section class="knowledge-tools">
@@ -263,10 +275,11 @@
                     <span class="reader-progress__fill" id="readerProgressFill"></span>
                   </div>
                   <p class="reader-progress__label" id="readerProgressLabel"></p>
+                  <p class="swipe-hint" id="readerSwipeHint">Sayfalar arasında sağa sola kaydırarak geçebilirsin.</p>
                 </div>
               </div>
 
-              <div class="reader-page">
+              <div class="reader-page" id="readerPageSurface">
                 <div class="reader-empty-state hidden" id="readerEmptyState"></div>
                 <div class="reader-text" id="readerText"></div>
                 <div class="reader-page-footer" id="readerPageFooter"></div>
@@ -276,7 +289,6 @@
         </div>
       </section>
 
-      <section class="section-grid" id="sectionGrid"></section>
     </main>
 
     <nav class="bottom-nav" id="bottomNav" aria-label="Alt gezinme">
@@ -314,6 +326,7 @@
           </div>
         </div>
 
+        <p class="swipe-hint swipe-hint--study" id="studySwipeHint">Sorular arasında sağa sola kaydırarak geçebilirsin.</p>
         <article class="question-card" id="questionCard">
           <div class="question-tags">
             <span class="tag" id="typeTag"></span>
@@ -328,6 +341,7 @@
         <section class="session-summary hidden" id="sessionSummary"></section>
 
         <div class="study-footer">
+          <button class="ghost-button" id="prevButton" type="button">Onceki</button>
           <button class="primary-button" id="checkButton" type="button">Cevabı Kontrol Et</button>
           <button class="ghost-button" id="nextButton" type="button">Sonraki</button>
         </div>

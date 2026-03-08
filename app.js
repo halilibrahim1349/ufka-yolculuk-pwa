@@ -65,6 +65,50 @@
     "ya",
     "yani",
   ]);
+  const SECTION_CATEGORY_ORDER = ["all", "foundation", "faith", "guidance", "afterlife"];
+  const SECTION_CATEGORY_META = {
+    all: {
+      id: "all",
+      title: "Tum Konular",
+      shortTitle: "Tum",
+      description: "Tum bolumleri birlikte gez.",
+    },
+    foundation: {
+      id: "foundation",
+      title: "Temel Sorular",
+      shortTitle: "Temel",
+      description: "Inanma ihtiyaci, bilgi ve inancin gerekliligi.",
+    },
+    faith: {
+      id: "faith",
+      title: "Iman ve Tevhit",
+      shortTitle: "Iman",
+      description: "Imanin kapsami ve Allah'i bilme ekseni.",
+    },
+    guidance: {
+      id: "guidance",
+      title: "Gayb ve Rehberlik",
+      shortTitle: "Rehberlik",
+      description: "Melekler, kitaplar ve peygamberlik bolumleri.",
+    },
+    afterlife: {
+      id: "afterlife",
+      title: "Ahiret ve Kader",
+      shortTitle: "Ahiret",
+      description: "Olum sonrasi hayat ve kader konulari.",
+    },
+  };
+  const SECTION_CATEGORY_BY_SECTION = {
+    s1: "foundation",
+    s2: "foundation",
+    s3: "faith",
+    s4: "faith",
+    s5: "guidance",
+    s6: "guidance",
+    s7: "guidance",
+    s8: "afterlife",
+    s9: "afterlife",
+  };
 
   const progressStrip = document.querySelector(".progress-strip");
   if (progressStrip && !document.getElementById("studySummaryPanel")) {
@@ -103,6 +147,8 @@
     readerEmptyState: document.getElementById("readerEmptyState"),
     readerText: document.getElementById("readerText"),
     readerPageFooter: document.getElementById("readerPageFooter"),
+    readerPageSurface: document.getElementById("readerPageSurface"),
+    readerSwipeHint: document.getElementById("readerSwipeHint"),
     searchInput: document.getElementById("searchInput"),
     bookSearchInput: document.getElementById("bookSearchInput"),
     clearBookSearchButton: document.getElementById("clearBookSearchButton"),
@@ -111,6 +157,8 @@
     askBookButton: document.getElementById("askBookButton"),
     clearAskBookButton: document.getElementById("clearAskBookButton"),
     qaAnswer: document.getElementById("qaAnswer"),
+    sectionCategoryRail: document.getElementById("sectionCategoryRail"),
+    sectionCategorySummary: document.getElementById("sectionCategorySummary"),
     sectionGrid: document.getElementById("sectionGrid"),
     wrongOnlyButton: document.getElementById("wrongOnlyButton"),
     exportButton: document.getElementById("exportButton"),
@@ -122,6 +170,7 @@
     pwaNote: document.getElementById("pwaNote"),
     bottomNav: document.getElementById("bottomNav"),
     studyOverlay: document.getElementById("studyOverlay"),
+    studyPanel: document.querySelector(".study-panel"),
     closeStudy: document.getElementById("closeStudy"),
     shuffleButton: document.getElementById("shuffleButton"),
     finishSessionButton: document.getElementById("finishSessionButton"),
@@ -134,6 +183,7 @@
     studySummaryCopy: document.getElementById("studySummaryCopy"),
     progressLabel: document.getElementById("progressLabel"),
     progressSummary: document.getElementById("progressSummary"),
+    studySwipeHint: document.getElementById("studySwipeHint"),
     studyTimer: document.getElementById("studyTimer"),
     typeTag: document.getElementById("typeTag"),
     difficultyTag: document.getElementById("difficultyTag"),
@@ -143,6 +193,7 @@
     optionList: document.getElementById("optionList"),
     feedbackBox: document.getElementById("feedbackBox"),
     sessionSummary: document.getElementById("sessionSummary"),
+    prevButton: document.getElementById("prevButton"),
     checkButton: document.getElementById("checkButton"),
     nextButton: document.getElementById("nextButton"),
     openAddModal: document.getElementById("openAddModal"),
@@ -197,6 +248,7 @@
     timerIntervalId: null,
     completionReason: "",
     navTarget: "homeSection",
+    sectionCategory: "all",
     readerSectionId: persisted.readerState.sectionId || "all",
     readerQuery: persisted.readerState.query || "",
     readerPageId: persisted.readerState.pageId || null,
@@ -223,7 +275,9 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
   };
 
-  const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+  function clamp(value, minimum, maximum) {
+    return Math.min(maximum, Math.max(minimum, value));
+  }
 
   const persistReaderPreferences = () => {
     persisted.readerPrefs = {
@@ -310,6 +364,15 @@
     });
 
   const getSectionById = (sectionId) => getSections().find((section) => section.id === sectionId);
+
+  const getSectionCategoryId = (section) => SECTION_CATEGORY_BY_SECTION[section?.id] || "foundation";
+
+  const getSectionCategoryMeta = (section) => SECTION_CATEGORY_META[getSectionCategoryId(section)] || SECTION_CATEGORY_META.foundation;
+
+  const getVisibleSectionCategoryIds = (sections) =>
+    SECTION_CATEGORY_ORDER.filter((categoryId) => categoryId !== "all").filter((categoryId) =>
+      sections.some((section) => getSectionCategoryId(section) === categoryId),
+    );
 
   const getQuestionInteraction = (question) => question?.interaction || "multiple";
 
@@ -938,6 +1001,14 @@
 
   const getCurrentQuestion = () => state.deck[state.index] || null;
 
+  const syncQuestionStateFromSession = () => {
+    const current = getCurrentQuestion();
+    const savedAnswer = current ? state.sessionAnswers[current.id] || null : null;
+    state.selectedIndex = Number.isInteger(savedAnswer?.selectedIndex) ? savedAnswer.selectedIndex : null;
+    state.typedAnswer = savedAnswer?.textAnswer || "";
+    state.checked = Boolean(savedAnswer);
+  };
+
   const getSessionMetrics = () => {
     const answers = Object.values(state.sessionAnswers);
     const correct = answers.filter((answer) => answer.correct).length;
@@ -1098,6 +1169,56 @@
   const setStudyVisibility = (visible) => {
     elements.studyOverlay.classList.toggle("hidden", !visible);
     elements.studyOverlay.setAttribute("aria-hidden", visible ? "false" : "true");
+    document.body.classList.toggle("study-open", visible);
+  };
+
+  const bindHorizontalSwipe = (element, { isEnabled, onPrev, onNext }) => {
+    if (!element) {
+      return;
+    }
+
+    let startX = 0;
+    let startY = 0;
+    let active = false;
+
+    element.addEventListener(
+      "touchstart",
+      (event) => {
+        if (event.touches.length !== 1 || (typeof isEnabled === "function" && !isEnabled())) {
+          active = false;
+          return;
+        }
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        active = true;
+      },
+      { passive: true },
+    );
+
+    element.addEventListener(
+      "touchend",
+      (event) => {
+        if (!active || event.changedTouches.length !== 1) {
+          active = false;
+          return;
+        }
+
+        const deltaX = event.changedTouches[0].clientX - startX;
+        const deltaY = event.changedTouches[0].clientY - startY;
+        active = false;
+
+        if (Math.abs(deltaX) < 56 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+          return;
+        }
+
+        if (deltaX > 0) {
+          onPrev?.();
+        } else {
+          onNext?.();
+        }
+      },
+      { passive: true },
+    );
   };
 
   const isExamMode = () => state.activeMode === "exam-mini" || state.activeMode === "exam-full";
@@ -1541,6 +1662,7 @@
     elements.readerEmptyState.classList.add("hidden");
     elements.readerEmptyState.innerHTML = "";
     elements.readerText.innerHTML = paragraphMarkup || `<p>${highlightText(currentPage.text, state.readerQuery)}</p>`;
+    elements.readerText.scrollTop = 0;
 
     elements.readerPageStrip.querySelectorAll("[data-reader-page]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -1651,6 +1773,7 @@
       elements.readerPageActions.innerHTML = "";
       elements.readerProgressFill.style.width = "0%";
       elements.readerProgressLabel.textContent = "Ilerleme gosterilemiyor";
+      elements.readerSwipeHint.classList.add("hidden");
       elements.readerText.innerHTML = "";
       elements.readerPageFooter.innerHTML = "";
       elements.readerEmptyState.classList.remove("hidden");
@@ -1669,6 +1792,7 @@
 
     renderReaderMeta(visiblePages, currentPage, currentIndex);
     renderReaderChapterList(visiblePages, currentPage);
+    elements.readerSwipeHint.classList.remove("hidden");
 
     elements.readerPrevButton.disabled = currentIndex <= 0;
     elements.readerNextButton.disabled = currentIndex >= visiblePages.length - 1;
@@ -1824,7 +1948,91 @@
     bindKnowledgeActions(elements.qaAnswer);
   };
 
-  const renderSections = () => {
+  const renderSectionCardMarkup = (section) => {
+    const metrics = getSectionMetrics(section);
+    const hasLearningDeck = metrics.learningTotal > 0;
+    const categoryMeta = getSectionCategoryMeta(section);
+    const summaryMarkup = getSummaryParts(section.summary).length
+      ? `
+        <details class="section-summary">
+          <summary>Bolum Ozeti</summary>
+          <div class="section-summary__body">${renderSummaryMarkup(section.summary)}</div>
+        </details>
+      `
+      : "";
+
+    return `
+      <article class="section-card section-card--lane">
+        <div class="card-top">
+          <div>
+            <span class="card-range">${section.pageRange}</span>
+            <h3>${section.title}</h3>
+          </div>
+          <span class="metric">${metrics.total + metrics.learningTotal} soru</span>
+        </div>
+        <p>${section.description}</p>
+        ${summaryMarkup}
+        <div class="metric-list">
+          <span class="metric">${categoryMeta.shortTitle}</span>
+          <span class="metric">${metrics.total} ana test</span>
+          <span class="metric muted">${metrics.learningTotal} ogretici</span>
+          <span class="metric">${metrics.correct} dogru</span>
+          <span class="metric muted">${metrics.wrong} yanlis</span>
+        </div>
+        <div class="card-bottom">
+          <button class="primary-button" data-open-section="${section.id}">Teste Basla</button>
+          ${hasLearningDeck ? `<button class="ghost-button" data-open-learning="${section.id}">Ogretici</button>` : ""}
+          <button class="ghost-button" data-open-summary="${section.id}">Ozeti Ac</button>
+          <button class="ghost-button" data-open-wrong="${section.id}">Yanlislar</button>
+        </div>
+      </article>
+    `;
+  };
+
+  const renderSectionCategoryRail = (filteredSections) => {
+    if (!elements.sectionCategoryRail || !elements.sectionCategorySummary) {
+      return;
+    }
+
+    const visibleCategoryIds = getVisibleSectionCategoryIds(filteredSections);
+    const chips = ["all", ...visibleCategoryIds]
+      .map((categoryId) => {
+        const meta = SECTION_CATEGORY_META[categoryId];
+        const count =
+          categoryId === "all"
+            ? filteredSections.length
+            : filteredSections.filter((section) => getSectionCategoryId(section) === categoryId).length;
+        return `
+          <button
+            class="section-category-chip ${state.sectionCategory === categoryId ? "is-active" : ""}"
+            type="button"
+            data-section-category="${meta.id}"
+          >
+            <span>${meta.shortTitle}</span>
+            <strong>${count}</strong>
+          </button>
+        `;
+      })
+      .join("");
+
+    elements.sectionCategoryRail.innerHTML = chips;
+
+    const activeMeta = SECTION_CATEGORY_META[state.sectionCategory] || SECTION_CATEGORY_META.all;
+    const activeCount =
+      state.sectionCategory === "all"
+        ? filteredSections.length
+        : filteredSections.filter((section) => getSectionCategoryId(section) === state.sectionCategory).length;
+    elements.sectionCategorySummary.textContent = `${activeMeta.title}: ${activeCount} konu. ${activeMeta.description}`;
+
+    elements.sectionCategoryRail.querySelectorAll("[data-section-category]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.sectionCategory = button.dataset.sectionCategory || "all";
+        renderSections();
+      });
+    });
+  };
+
+  const renderSectionsLegacy = () => {
     const sections = getSections();
     const filtered = sections.filter((section) => {
       const haystack = `${section.title} ${section.description} ${section.pageRange} ${getSummaryText(section.summary)}`.toLowerCase();
@@ -1873,6 +2081,71 @@
               <button class="ghost-button" data-open-wrong="${section.id}">Yanlışlar</button>
             </div>
           </article>
+        `;
+      })
+      .join("");
+
+    elements.sectionGrid.querySelectorAll("[data-open-section]").forEach((button) => {
+      button.addEventListener("click", () => openStudy(button.dataset.openSection, "section"));
+    });
+
+    elements.sectionGrid.querySelectorAll("[data-open-wrong]").forEach((button) => {
+      button.addEventListener("click", () => openStudy(button.dataset.openWrong, "wrong-section"));
+    });
+
+    elements.sectionGrid.querySelectorAll("[data-open-summary]").forEach((button) => {
+      button.addEventListener("click", () => openSummaryModal(button.dataset.openSummary));
+    });
+
+    elements.sectionGrid.querySelectorAll("[data-open-learning]").forEach((button) => {
+      button.addEventListener("click", () => openStudy(button.dataset.openLearning, "section-learning"));
+    });
+  };
+
+  const renderSections = () => {
+    const sections = getSections();
+    const filtered = sections.filter((section) => {
+      const haystack = `${section.title} ${section.description} ${section.pageRange} ${getSummaryText(section.summary)}`.toLowerCase();
+      return haystack.includes(state.query.toLowerCase());
+    });
+
+    renderSectionCategoryRail(filtered);
+
+    if (!filtered.length) {
+      elements.sectionGrid.innerHTML = '<div class="empty-state">Aramanla eslesen konu bulunamadi.</div>';
+      return;
+    }
+
+    const categoryIds =
+      state.sectionCategory === "all"
+        ? getVisibleSectionCategoryIds(filtered)
+        : [state.sectionCategory].filter((categoryId) =>
+            filtered.some((section) => getSectionCategoryId(section) === categoryId),
+          );
+
+    if (!categoryIds.length) {
+      elements.sectionGrid.innerHTML = '<div class="empty-state">Bu kategori icinde gosterilecek konu kalmadi.</div>';
+      return;
+    }
+
+    elements.sectionGrid.innerHTML = categoryIds
+      .map((categoryId) => {
+        const meta = SECTION_CATEGORY_META[categoryId];
+        const categorySections = filtered.filter((section) => getSectionCategoryId(section) === categoryId);
+        return `
+          <section class="section-layer">
+            <div class="section-layer__head">
+              <div>
+                <p class="eyebrow">${meta.shortTitle}</p>
+                <h3>${meta.title}</h3>
+                <p>${meta.description}</p>
+              </div>
+              <span class="metric">${categorySections.length} konu</span>
+            </div>
+            <div class="section-lane">
+              ${categorySections.map((section) => renderSectionCardMarkup(section)).join("")}
+            </div>
+          </section>
         `;
       })
       .join("");
@@ -1994,6 +2267,7 @@
     elements.finishSessionButton.classList.toggle("hidden", !config?.finite || state.sessionComplete || !state.deck.length);
     elements.sectionWrongButton.classList.toggle("hidden", !config?.allowWrongButton);
     elements.studyTimer.classList.toggle("hidden", !(config?.timerSeconds > 0) || state.sessionComplete);
+    elements.studySwipeHint.classList.toggle("hidden", state.sessionComplete || !state.deck.length);
 
     if (config?.timerSeconds > 0 && !state.sessionComplete) {
       updateTimer();
@@ -2005,6 +2279,7 @@
       elements.feedbackBox.className = "feedback hidden";
       elements.progressLabel.textContent = "Oturum tamamlandı";
       elements.progressSummary.textContent = `${metrics.correct} doğru · ${metrics.wrong} yanlış · ${metrics.skipped} boş`;
+      elements.prevButton.disabled = true;
       elements.checkButton.classList.add("hidden");
       elements.nextButton.disabled = false;
       elements.nextButton.textContent = "Kapat";
@@ -2025,6 +2300,7 @@
       elements.typeTag.textContent = "";
       elements.difficultyTag.textContent = "";
       elements.customTag.textContent = "";
+      elements.prevButton.disabled = true;
       elements.checkButton.disabled = true;
       elements.nextButton.disabled = false;
       elements.nextButton.textContent = "Kapat";
@@ -2037,6 +2313,8 @@
     elements.difficultyTag.textContent = current.difficulty;
     elements.customTag.textContent = current.isCustom ? "Özel Soru" : current.sectionTitle;
     elements.questionStem.textContent = current.stem;
+    elements.prevButton.disabled = state.index <= 0;
+    elements.questionCard.scrollTop = 0;
 
     const finishing = state.index >= state.deck.length - 1 && config?.finite;
     if (!state.checked) {
@@ -2178,6 +2456,21 @@
     renderStudy();
   };
 
+  const goPrevious = () => {
+    if (state.sessionComplete || !state.deck.length || state.index <= 0) {
+      return;
+    }
+
+    const current = getCurrentQuestion();
+    if (!state.checked && hasPendingResponse(current)) {
+      saveCurrentAnswer();
+    }
+
+    state.index -= 1;
+    syncQuestionStateFromSession();
+    renderStudy();
+  };
+
   const goNext = () => {
     if (state.sessionComplete || !state.deck.length) {
       closeStudy();
@@ -2199,9 +2492,7 @@
       state.index += 1;
     }
 
-    state.selectedIndex = null;
-    state.typedAnswer = "";
-    state.checked = false;
+    syncQuestionStateFromSession();
     renderStudy();
   };
 
@@ -2211,10 +2502,26 @@
     }
     state.deck = shuffle(state.deck);
     state.index = 0;
-    state.selectedIndex = null;
-    state.typedAnswer = "";
-    state.checked = false;
+    syncQuestionStateFromSession();
     renderStudy();
+  };
+
+  const goReaderPrevious = () => {
+    const visiblePages = getReaderVisiblePages();
+    const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
+    if (currentIndex > 0) {
+      state.readerPageId = visiblePages[currentIndex - 1].id;
+      renderBookReader();
+    }
+  };
+
+  const goReaderNext = () => {
+    const visiblePages = getReaderVisiblePages();
+    const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
+    if (currentIndex >= 0 && currentIndex < visiblePages.length - 1) {
+      state.readerPageId = visiblePages[currentIndex + 1].id;
+      renderBookReader();
+    }
   };
 
   const clearModal = () => {
@@ -2418,26 +2725,24 @@
     persistReaderPreferences();
     renderBookReader();
   });
-  elements.readerPrevButton.addEventListener("click", () => {
-    const visiblePages = getReaderVisiblePages();
-    const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
-    if (currentIndex > 0) {
-      state.readerPageId = visiblePages[currentIndex - 1].id;
-      renderBookReader();
-    }
-  });
-  elements.readerNextButton.addEventListener("click", () => {
-    const visiblePages = getReaderVisiblePages();
-    const currentIndex = visiblePages.findIndex((page) => page.id === state.readerPageId);
-    if (currentIndex >= 0 && currentIndex < visiblePages.length - 1) {
-      state.readerPageId = visiblePages[currentIndex + 1].id;
-      renderBookReader();
-    }
-  });
+  elements.readerPrevButton.addEventListener("click", goReaderPrevious);
+  elements.readerNextButton.addEventListener("click", goReaderNext);
   document.addEventListener("keydown", (event) => {
     const targetTag = event.target?.tagName;
     if (targetTag === "INPUT" || targetTag === "TEXTAREA" || targetTag === "SELECT") {
       return;
+    }
+    if (!elements.studyOverlay.classList.contains("hidden") && !state.sessionComplete) {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        goPrevious();
+        return;
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        goNext();
+        return;
+      }
     }
     if (state.navTarget !== "readerSection") {
       return;
@@ -2510,6 +2815,7 @@
     }
     openSummaryModal(state.activeSectionId);
   });
+  elements.prevButton.addEventListener("click", goPrevious);
   elements.checkButton.addEventListener("click", recordAnswer);
   elements.nextButton.addEventListener("click", goNext);
   elements.summaryCloseButton.addEventListener("click", closeSummaryModal);
@@ -2533,6 +2839,18 @@
     elements.addModal.showModal();
   });
   elements.saveCustomQuestion.addEventListener("click", saveCustomQuestion);
+
+  bindHorizontalSwipe(elements.questionCard, {
+    isEnabled: () => !elements.studyOverlay.classList.contains("hidden") && !state.sessionComplete && state.deck.length > 0,
+    onPrev: goPrevious,
+    onNext: goNext,
+  });
+
+  bindHorizontalSwipe(elements.readerPageSurface, {
+    isEnabled: () => !elements.readerSection.classList.contains("hidden"),
+    onPrev: goReaderPrevious,
+    onNext: goReaderNext,
+  });
 
   elements.bottomNav.querySelectorAll("[data-nav-target]").forEach((button) => {
     button.addEventListener("click", () => {
