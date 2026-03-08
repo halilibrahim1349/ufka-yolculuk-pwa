@@ -1262,6 +1262,27 @@ summary:focus-visible {
   background: linear-gradient(145deg, rgba(255, 250, 243, 0.96), rgba(230, 243, 239, 0.9));
 }
 
+.session-summary__section {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.session-summary__section h4 {
+  margin: 6px 0 0;
+  font-size: 1.06rem;
+}
+
+.session-summary__lead {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
 .study-footer {
   position: sticky;
   bottom: calc(-1 * var(--safe-bottom));

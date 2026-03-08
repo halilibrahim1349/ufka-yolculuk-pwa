@@ -1,4 +1,4 @@
-const CACHE_NAME = "ufka-yolculuk-pwa-v24";
+const CACHE_NAME = "ufka-yolculuk-pwa-v25";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -24,6 +24,7 @@ const APP_SHELL = [
   "./data/section-s9.js",
   "./data/section-s9-learning.js",
   "./data/section-memorization.js",
+  "./data/content-quality-overrides.js",
   "./data/book-content.js",
   "./assets/pwa/icon-192.png",
   "./assets/pwa/icon-512.png",

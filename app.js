@@ -1366,7 +1366,7 @@
         mode,
         sectionId,
         title: `${section?.title || "Konu"} - Ogretici Calisma`,
-        description: "Bosluk doldurma ve dogru/yanlis sorularini ayri Ogretici kategori olarak Cozuyorsun.",
+        description: "Ogretici kategoride, bolumun temel iddialarini yoklayan yuksek seviyeli dogru/yanlis sorularini cozuyorsun.",
         range: section?.pageRange || "Konu bolumu",
         summary: section?.summary || [],
         allowCustom: false,
@@ -2461,6 +2461,8 @@
     const breakdown = getSessionWrongBreakdown();
     const reviewItems = getSessionReviewItems();
     const isExam = isExamMode();
+    const sessionSummary = state.sessionConfig?.summary || [];
+    const activeSection = state.activeSectionId ? getSectionById(state.activeSectionId) : null;
     const reasonText =
       state.completionReason === "time"
         ? "Sure doldu. Oturum mevcut cevaplarinla kapatildi."
@@ -2476,6 +2478,25 @@
           .map((item) => item.sectionTitle)
           .join(", ") || "yok"}.`
       : "Bu oturumda yanlis veya bos soru olusmadi.";
+
+    const sectionSummaryMarkup =
+      !isExam && activeSection && hasSummary(sessionSummary)
+        ? `
+          <section class="session-summary__section">
+            <div>
+              <p class="eyebrow">Bolum Sonu Ozeti</p>
+              <h4>${escapeHtml(activeSection.title)}</h4>
+              <p class="session-summary__lead">
+                Test bittikten sonra konunun ana cizgisini, sik karistirilan ayrimlari ve temel kavram omurgasini toplu
+                olarak tekrar etmen icin genis ozet asagida tutuldu.
+              </p>
+            </div>
+            <div class="study-summary-copy">
+              ${renderSummaryMarkup(sessionSummary)}
+            </div>
+          </section>
+        `
+        : "";
 
     const reviewMarkup = reviewItems.length
       ? `
@@ -2535,6 +2556,7 @@
         </article>
       </div>
       <p class="summary-note">${breakdownText}</p>
+      ${sectionSummaryMarkup}
       ${reviewMarkup}
     `;
   };
