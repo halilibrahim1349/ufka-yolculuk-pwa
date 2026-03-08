@@ -1402,6 +1402,14 @@ mark {
 }
 
 @media (max-width: 640px) {
+  #bookScreen .screen-head {
+    gap: 2px;
+  }
+
+  #bookScreen .screen-head p:last-child {
+    display: none;
+  }
+
   .screen-head {
     gap: 6px;
   }
@@ -1438,11 +1446,56 @@ mark {
   }
 
   .reader-pane--solo {
-    min-height: min(58dvh, 680px);
+    min-height: auto;
+    overflow: visible;
   }
 
   .reader-meta--compact {
     grid-template-columns: 1fr;
+  }
+
+  .reader-section__intro {
+    display: none;
+  }
+
+  .reader-pane__chrome {
+    gap: 10px;
+  }
+
+  .reader-page {
+    grid-template-rows: auto;
+    overflow: visible;
+    padding: 12px;
+  }
+
+  .reader-text {
+    overflow: visible;
+    min-height: auto;
+    padding-right: 0;
+  }
+
+  .reader-page-footer {
+    padding-top: 6px;
+    border-top: 1px solid rgba(15, 92, 92, 0.08);
+  }
+
+  .reader-meta--compact {
+    display: none;
+  }
+
+  .reader-pane__actions,
+  .reader-page-strip,
+  .reader-progress__track {
+    display: none;
+  }
+
+  .reader-progress__label,
+  #readerSwipeHint {
+    display: none;
+  }
+
+  .reader-page-strip {
+    gap: 8px;
   }
 
   .study-actions {
