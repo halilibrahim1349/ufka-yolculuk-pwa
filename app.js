@@ -379,13 +379,26 @@
 
   const getQuestionInteraction = (question) => question?.interaction || "multiple";
 
-  const isLearningQuestion = (question) => ["fill", "true-false"].includes(getQuestionInteraction(question));
+  const getQuestionStudyCategory = (question) => {
+    if (question?.studyCategory === "memorization") {
+      return "memorization";
+    }
+    if (question?.studyCategory === "learning") {
+      return "learning";
+    }
+    return ["fill", "true-false"].includes(getQuestionInteraction(question)) ? "learning" : "primary";
+  };
+
+  const isLearningQuestion = (question) => getQuestionStudyCategory(question) === "learning";
+
+  const isMemorizationQuestion = (question) => getQuestionStudyCategory(question) === "memorization";
 
   const getSectionQuestionGroups = (section) => {
     const questions = section?.questions || [];
     return {
-      primary: questions.filter((question) => !isLearningQuestion(question)),
+      primary: questions.filter((question) => getQuestionStudyCategory(question) === "primary"),
       learning: questions.filter((question) => isLearningQuestion(question)),
+      memorization: questions.filter((question) => isMemorizationQuestion(question)),
     };
   };
 
@@ -395,14 +408,21 @@
       return [];
     }
     const groups = getSectionQuestionGroups(section);
-    const source = category === "learning" ? groups.learning : groups.primary;
+    const source = category === "learning" ? groups.learning : category === "memorization" ? groups.memorization : groups.primary;
     return source.map((question) => cloneQuestion(question, section));
   };
 
   const getAllQuestions = (category = "primary") =>
     getSections().flatMap((section) => {
       const groups = getSectionQuestionGroups(section);
-      const source = category === "all" ? section.questions : category === "learning" ? groups.learning : groups.primary;
+      const source =
+        category === "all"
+          ? section.questions
+          : category === "learning"
+            ? groups.learning
+            : category === "memorization"
+              ? groups.memorization
+              : groups.primary;
       return source.map((question) => cloneQuestion(question, section));
     });
 
@@ -947,6 +967,7 @@
     return {
       total: questions.length,
       learningTotal: groups.learning.length,
+      memorizationTotal: groups.memorization.length,
       solved: results.length,
       correct: results.filter((item) => item.correct).length,
       wrong: results.filter((item) => item.correct === false).length,
@@ -1354,6 +1375,24 @@
         sectionId,
         title: `${section?.title || "Konu"} - Ogretici Calisma`,
         description: "Bosluk doldurma ve dogru/yanlis sorularini ayri Ogretici kategori olarak Cozuyorsun.",
+        range: section?.pageRange || "Konu bolumu",
+        summary: section?.summary || [],
+        allowCustom: false,
+        allowShuffle: true,
+        allowWrongButton: false,
+        finite: true,
+      });
+      return;
+    }
+
+    if (mode === "section-memorization") {
+      const section = getSectionById(sectionId);
+      startSession({
+        deck: buildSectionDeck(sectionId, "memorization"),
+        mode,
+        sectionId,
+        title: `${section?.title || "Konu"} - Ezber Calisma`,
+        description: "Bu havuz, bolumun daha zor dogrudan hatirlama ve kavram yerini bulma sorularini ayri Ezber kategorisi olarak sunar.",
         range: section?.pageRange || "Konu bolumu",
         summary: section?.summary || [],
         allowCustom: false,
@@ -2211,6 +2250,7 @@
   const renderSectionCardMarkup = (section) => {
     const metrics = getSectionMetrics(section);
     const hasLearningDeck = metrics.learningTotal > 0;
+    const hasMemorizationDeck = metrics.memorizationTotal > 0;
     const categoryMeta = getSectionCategoryMeta(section);
 
     return `
@@ -2220,19 +2260,21 @@
             <span class="card-range">${section.pageRange}</span>
             <h3>${section.title}</h3>
           </div>
-          <span class="metric">${metrics.total + metrics.learningTotal} soru</span>
+          <span class="metric">${metrics.total + metrics.learningTotal + metrics.memorizationTotal} soru</span>
         </div>
         <p>${section.description}</p>
         <div class="metric-list">
           <span class="metric">${categoryMeta.shortTitle}</span>
           <span class="metric">${metrics.total} ana test</span>
           <span class="metric muted">${metrics.learningTotal} ogretici</span>
+          <span class="metric muted">${metrics.memorizationTotal} ezber</span>
           <span class="metric">${metrics.correct} dogru</span>
           <span class="metric muted">${metrics.wrong} yanlis</span>
         </div>
         <div class="card-bottom">
           <button class="primary-button" data-open-section="${section.id}">Teste Basla</button>
           ${hasLearningDeck ? `<button class="ghost-button" data-open-learning="${section.id}">Ogretici</button>` : ""}
+          ${hasMemorizationDeck ? `<button class="ghost-button" data-open-memorization="${section.id}">Ezber</button>` : ""}
           <button class="ghost-button" data-open-summary="${section.id}">Ozeti Ac</button>
           <button class="ghost-button" data-open-wrong="${section.id}">Yanlislar</button>
         </div>
@@ -2300,6 +2342,7 @@
       .map((section) => {
         const metrics = getSectionMetrics(section);
         const hasLearningDeck = metrics.learningTotal > 0;
+        const hasMemorizationDeck = metrics.memorizationTotal > 0;
         return `
           <article class="section-card">
             <div class="card-top">
@@ -2307,12 +2350,13 @@
                 <span class="card-range">${section.pageRange}</span>
                 <h3>${section.title}</h3>
               </div>
-              <span class="metric">${metrics.total + metrics.learningTotal} soru</span>
+              <span class="metric">${metrics.total + metrics.learningTotal + metrics.memorizationTotal} soru</span>
             </div>
             <p>${section.description}</p>
             <div class="metric-list">
               <span class="metric">${metrics.total} ana test</span>
               <span class="metric muted">${metrics.learningTotal} Ogretici</span>
+              <span class="metric muted">${metrics.memorizationTotal} Ezber</span>
               <span class="metric">${metrics.correct} dogru</span>
               <span class="metric muted">${metrics.wrong} yanlis</span>
               <span class="metric muted">${metrics.custom} Ozel</span>
@@ -2320,6 +2364,7 @@
             <div class="card-bottom">
               <button class="primary-button" data-open-section="${section.id}">Teste Basla</button>
               ${hasLearningDeck ? `<button class="ghost-button" data-open-learning="${section.id}">Ogretici</button>` : ""}
+              ${hasMemorizationDeck ? `<button class="ghost-button" data-open-memorization="${section.id}">Ezber</button>` : ""}
               <button class="ghost-button" data-open-summary="${section.id}">Ozeti Ac</button>
               <button class="ghost-button" data-open-wrong="${section.id}">Yanlislar</button>
             </div>
@@ -2342,6 +2387,10 @@
 
     elements.sectionGrid.querySelectorAll("[data-open-learning]").forEach((button) => {
       button.addEventListener("click", () => openStudy(button.dataset.openLearning, "section-learning"));
+    });
+
+    elements.sectionGrid.querySelectorAll("[data-open-memorization]").forEach((button) => {
+      button.addEventListener("click", () => openStudy(button.dataset.openMemorization, "section-memorization"));
     });
   };
 
@@ -2408,6 +2457,10 @@
 
     elements.sectionGrid.querySelectorAll("[data-open-learning]").forEach((button) => {
       button.addEventListener("click", () => openStudy(button.dataset.openLearning, "section-learning"));
+    });
+
+    elements.sectionGrid.querySelectorAll("[data-open-memorization]").forEach((button) => {
+      button.addEventListener("click", () => openStudy(button.dataset.openMemorization, "section-memorization"));
     });
   };
 
