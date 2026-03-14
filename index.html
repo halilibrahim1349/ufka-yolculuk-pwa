@@ -62,15 +62,15 @@
           <section class="hero">
             <div class="hero-copy-block">
               <p class="eyebrow">Hazirlik Merkezi</p>
-              <h2>Zor soru, konu bazli test, kitap okuyucu</h2>
+              <h2>Ne yapmak istedigini sec ve tek dokunusla basla</h2>
               <p class="hero-copy">
-                Uygulama mobilde tek sayfa gibi uzamaz. Her alan kendi ekraninda acilir; bolumler yatay seritlerle,
-                kitap okuyucu da ayri bir panel mantigiyla calisir.
+                Konular, kitap, deneme ve tekrar birbirinden ayrildi. Hangi calisma turune ihtiyacin varsa dogrudan o
+                ekrana gec ve dikkat dagilmadan devam et.
               </p>
             </div>
 
             <div class="hero-actions">
-              <button class="ghost-button" id="wrongOnlyButton" type="button">Yanlislari Coz</button>
+              <button class="ghost-button" id="wrongOnlyButton" type="button">Yanlislarimi Coz</button>
               <button class="ghost-button" id="exportButton" type="button">Ozel Sorulari Disa Aktar</button>
               <button class="ghost-button hidden" id="installAppButton" type="button">Uygulamayi Yukle</button>
             </div>
@@ -78,6 +78,38 @@
             <p class="pwa-note" id="pwaNote">PWA kurulumu icin uygulamayi localhost veya HTTPS uzerinden ac.</p>
 
             <div class="stat-rail" id="heroStats"></div>
+          </section>
+
+          <section class="feature-card feature-card--compact guide-card">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Kullanim Akisi</p>
+                <h2>En rahat calisma sirasi</h2>
+                <p>Uygulamayi ilk kez kullaniyorsan asagidaki sira en temiz ve en verimli akistir.</p>
+              </div>
+              <div class="guide-actions">
+                <button class="primary-button" data-open-screen="sectionsScreen" type="button">Konulara Git</button>
+                <button class="ghost-button" data-open-screen="bookScreen" type="button">Kitabi Ac</button>
+              </div>
+            </div>
+
+            <div class="guide-step-grid">
+              <article class="guide-step">
+                <span class="guide-step__index">1</span>
+                <strong>Ozeti oku</strong>
+                <p>Bolumu once genel cizgileriyle gor ve temel kavramlari yerli yerine oturt.</p>
+              </article>
+              <article class="guide-step">
+                <span class="guide-step__index">2</span>
+                <strong>Ana teste gir</strong>
+                <p>Bolumun asil sorularini cozupt hangi basliklarda zorlandigini fark et.</p>
+              </article>
+              <article class="guide-step">
+                <span class="guide-step__index">3</span>
+                <strong>Ogretici ve ezber ile pekistir</strong>
+                <p>Dogru-yanlis ve ezber setiyle bilgiyi kapat, sonra denemeye gec.</p>
+              </article>
+            </div>
           </section>
 
           <section class="feature-card feature-card--compact">
@@ -124,9 +156,23 @@
         <div class="screen-body screen-body--sections">
           <section class="toolbar feature-card feature-card--compact">
             <label class="search-box" for="searchInput">
-              <span>Konu kartlarini filtrele</span>
+              <span>Konu ara</span>
               <input id="searchInput" type="search" placeholder="Bolum, kavram veya ozet ara" autocomplete="off" />
             </label>
+          </section>
+
+          <section class="feature-card feature-card--compact guide-card guide-card--inline">
+            <div>
+              <p class="eyebrow">Onerilen Sira</p>
+              <h2>Her konuda ayni mantikla ilerle</h2>
+              <p>Once ozet, sonra ana test. Takildigin yerde ogretici setine, en son ezber ve yanlislar ekranina don.</p>
+            </div>
+            <div class="guide-pill-rail" aria-label="Bolum calisma adimlari">
+              <span class="guide-pill">1 Ozeti Gor</span>
+              <span class="guide-pill">2 Ana Test</span>
+              <span class="guide-pill">3 Ogretici</span>
+              <span class="guide-pill">4 Ezber / Yanlislar</span>
+            </div>
           </section>
 
           <section class="feature-card section-browser">
@@ -157,6 +203,19 @@
         </header>
 
         <div class="screen-body screen-body--book">
+          <section class="feature-card feature-card--compact guide-card guide-card--inline">
+            <div>
+              <p class="eyebrow">Kitap Ekrani</p>
+              <h2>Oku, ara, sonra sor</h2>
+              <p>Bu ekran uc amaca ayrildi. Once metni oku, sonra ihtiyac duydugun kavrami ara, en son kitaba soru sor.</p>
+            </div>
+            <div class="guide-pill-rail" aria-label="Kitap kullanim adimlari">
+              <span class="guide-pill">Oku</span>
+              <span class="guide-pill">Kelime Ara</span>
+              <span class="guide-pill">Metne Soru Sor</span>
+            </div>
+          </section>
+
           <section class="book-workspace">
             <div class="book-view-switch" role="tablist" aria-label="Kitap araclari">
               <button class="book-view-button is-active" type="button" role="tab" aria-selected="true" data-book-view="read">
@@ -365,15 +424,23 @@
           <article class="feature-card" id="examSection">
             <div>
               <p class="eyebrow">Deneme Modu</p>
-              <h2>Karisik denemeler</h2>
+              <h2>Karisik ve ozel denemeler</h2>
               <p>
-                Konular arasi dengeli dagitilan sorularla sureli deneme cozersin. Sonuc ekraninda dogru, yanlis ve bos
-                dagilimi toplu olarak gelir.
+                Karisik sureli denemelerin yanina, biri resmi Ufka tarzina yakin 100 soruluk; digeri ise yalniz kitaptan
+                turetilmis bilgi ve ezber odakli 200 soruluk ozel set eklendi.
               </p>
             </div>
+            <div class="metric-list" aria-label="Ozel deneme ozellikleri">
+              <span class="tag">5 sikli</span>
+              <span class="tag muted">2 ozel set</span>
+              <span class="tag muted">100-200 soru</span>
+            </div>
             <div class="feature-metric-grid" id="examStats"></div>
+            <p class="summary-note">Bilgi Deneme Testi yalniz kitaptaki bilgi omurgasindan 200 soruluk olarak, Ufka Tarzi 100 ise karma zorlayici havuzdan secilir.</p>
             <div class="feature-actions">
-              <button class="primary-button" id="startMiniExamButton" type="button">30 Soruluk Deneme</button>
+              <button class="primary-button" id="startUfkaStyleExamButton" type="button">Ufka Tarzi 100</button>
+              <button class="ghost-button" id="startBookKnowledgeExamButton" type="button">Bilgi Deneme 200</button>
+              <button class="ghost-button" id="startMiniExamButton" type="button">30 Soruluk Deneme</button>
               <button class="ghost-button" id="startFullExamButton" type="button">50 Soruluk Deneme</button>
             </div>
           </article>
@@ -413,11 +480,11 @@
     <nav class="bottom-nav" id="bottomNav" aria-label="Alt gezinme">
       <button class="bottom-nav__item is-active" data-nav-target="homeScreen" type="button">
         <strong>Ana</strong>
-        <span>Genel</span>
+        <span>Baslangic</span>
       </button>
       <button class="bottom-nav__item" data-nav-target="sectionsScreen" type="button">
-        <strong>Bolum</strong>
-        <span>Konular</span>
+        <strong>Konular</strong>
+        <span>Calisma</span>
       </button>
       <button class="bottom-nav__item" data-nav-target="bookScreen" type="button">
         <strong>Kitap</strong>
@@ -443,8 +510,8 @@
             <p id="studyDescription"></p>
           </div>
           <div class="study-actions">
-            <button class="ghost-button hidden" id="openSummaryButton" type="button">Bolum Ozeti</button>
-            <button class="ghost-button" id="shuffleButton" type="button">Karistir</button>
+            <button class="ghost-button hidden" id="openSummaryButton" type="button">Ozeti Gor</button>
+            <button class="ghost-button" id="shuffleButton" type="button">Sirayi Karistir</button>
             <button class="ghost-button hidden" id="finishSessionButton" type="button">Oturumu Bitir</button>
             <button class="ghost-button" id="openAddModal" type="button">Soru Ekle</button>
           </div>
@@ -483,7 +550,7 @@
 
         <div class="study-footer">
           <button class="ghost-button" id="prevButton" type="button">Onceki</button>
-          <button class="primary-button" id="checkButton" type="button">Cevabi Kontrol Et</button>
+          <button class="primary-button" id="checkButton" type="button">Cevabi Kaydet</button>
           <button class="ghost-button" id="nextButton" type="button">Sonraki</button>
         </div>
       </div>
@@ -588,6 +655,8 @@
     <script src="data/section-s9-learning.js"></script>
     <script src="data/section-memorization.js"></script>
     <script src="data/content-quality-overrides.js"></script>
+    <script src="data/ufka-style-exams.js"></script>
+    <script src="data/book-knowledge-expansion.js"></script>
     <script src="data/book-content.js"></script>
     <script src="app.js"></script>
   </body>

@@ -26,9 +26,26 @@
       title: "50 Soruluk Deneme",
       description: "Genis kapsamli sureli karisik deneme oturumu.",
     },
+    ufkaStyle: {
+      mode: "exam-ufka-style",
+      count: 100,
+      durationMinutes: 100,
+      title: "Ufka Yolculuk Tarzi Sinav Sorulari",
+      description: "5 sikli, yuksek zorluklu ve resmi formattan esinlenen ozel deneme oturumu.",
+      specialExamId: "ufkaStyle100",
+    },
+    bookKnowledge: {
+      mode: "exam-book-knowledge",
+      count: 100,
+      durationMinutes: 100,
+      title: "Bilgi Deneme Testi",
+      description: "Yalniz kitaptan turetilmis dogrudan bilgi ve ezber odakli ozel deneme oturumu.",
+      specialExamId: "bookKnowledge100",
+    },
   };
 
   const baseData = window.UFKA_DATA;
+  const specialExamData = window.UFKA_SPECIAL_EXAMS || {};
   const bookData = window.UFKA_BOOK_DATA || { pages: [], sections: [] };
   const staticSectionById = new Map((baseData.sections || []).map((section) => [section.id, section]));
   const SEARCH_STOP_WORDS = new Set([
@@ -157,6 +174,8 @@
     wrongOnlyButton: document.getElementById("wrongOnlyButton"),
     exportButton: document.getElementById("exportButton"),
     installAppButton: document.getElementById("installAppButton"),
+    startUfkaStyleExamButton: document.getElementById("startUfkaStyleExamButton"),
+    startBookKnowledgeExamButton: document.getElementById("startBookKnowledgeExamButton"),
     startMiniExamButton: document.getElementById("startMiniExamButton"),
     startFullExamButton: document.getElementById("startFullExamButton"),
     startAutoReviewButton: document.getElementById("startAutoReviewButton"),
@@ -918,6 +937,68 @@
 
   const buildSectionDeck = (sectionId, category = "primary") => getSectionDeckByCategory(sectionId, category);
 
+  const buildSpecialExamDeck = (specialExamId) => {
+    const specialExam = specialExamData[specialExamId];
+    if (!specialExam) {
+      return [];
+    }
+
+    const deck = [];
+    const seenQuestionIds = new Set();
+
+    const pushQuestions = (section, pool, count) => {
+      pool.slice(0, count).forEach((question) => {
+        if (seenQuestionIds.has(question.id)) {
+          return;
+        }
+        seenQuestionIds.add(question.id);
+        deck.push(cloneQuestion(question, section));
+      });
+    };
+
+    (specialExam.sectionPlan || []).forEach((plan) => {
+      const section = getSectionById(plan.sectionId);
+      if (!section) {
+        return;
+      }
+
+      const primaryQuestions = getSectionQuestionGroups(section).primary.filter((question) => !question.isCustom);
+      const knowledgeQuestions = primaryQuestions.filter((question) => question.type === "knowledge");
+      const paragraphQuestions = primaryQuestions.filter((question) => question.type === "paragraph");
+      const targetCount = Number(plan.knowledge || 0) + Number(plan.paragraph || 0);
+      const beforeCount = deck.length;
+
+      pushQuestions(section, knowledgeQuestions, plan.knowledge || 0);
+      pushQuestions(section, paragraphQuestions, plan.paragraph || 0);
+
+      const shortfall = targetCount - (deck.length - beforeCount);
+      if (shortfall > 0) {
+        pushQuestions(section, primaryQuestions, shortfall);
+      }
+    });
+
+    (specialExam.extraQuestions || []).forEach((question) => {
+      if (seenQuestionIds.has(question.id)) {
+        return;
+      }
+
+      const section = question.sectionId ? getSectionById(question.sectionId) : null;
+      const enrichedQuestion = section
+        ? cloneQuestion(question, section)
+        : {
+            ...question,
+            sectionId: question.sectionId || specialExam.id,
+            sectionTitle: question.sectionTitle || specialExam.title,
+            pageRange: question.pageRange || specialExam.range,
+          };
+
+      seenQuestionIds.add(enrichedQuestion.id);
+      deck.push(enrichedQuestion);
+    });
+
+    return shuffle(deck).slice(0, specialExam.questionCount || deck.length);
+  };
+
   const buildBalancedDeck = (count) => {
     const sectionPools = shuffle(
       getSections()
@@ -1293,7 +1374,7 @@
     );
   };
 
-  const isExamMode = () => state.activeMode === "exam-mini" || state.activeMode === "exam-full";
+  const isExamMode = () => String(state.activeMode || "").startsWith("exam-");
 
   const startSession = ({
     deck,
@@ -1430,15 +1511,24 @@
 
   const startExam = (presetKey) => {
     const preset = EXAM_PRESETS[presetKey];
-    const availableCount = Math.min(preset.count, getAllQuestions().length);
-    const deck = buildBalancedDeck(availableCount);
+    if (!preset) {
+      return;
+    }
+
+    const specialExam = preset.specialExamId ? specialExamData[preset.specialExamId] || null : null;
+    const availableCount = specialExam
+      ? Math.min(specialExam.questionCount || preset.count, getAllQuestions().length)
+      : Math.min(preset.count, getAllQuestions().length);
+    const deck = specialExam ? buildSpecialExamDeck(preset.specialExamId) : buildBalancedDeck(availableCount);
+    const durationMinutes = specialExam?.durationMinutes || preset.durationMinutes;
+
     startSession({
-      deck,
+      deck: deck.length ? deck : buildBalancedDeck(availableCount),
       mode: preset.mode,
-      title: preset.title,
-      description: `${preset.description} Sure: ${preset.durationMinutes} dakika.`,
-      range: "Karisik konu dagilimi",
-      timerSeconds: preset.durationMinutes * 60,
+      title: specialExam?.title || preset.title,
+      description: `${specialExam?.description || preset.description} Sure: ${durationMinutes} dakika.`,
+      range: specialExam?.range || "Karisik konu dagilimi",
+      timerSeconds: durationMinutes * 60,
       allowCustom: false,
       allowShuffle: false,
       allowWrongButton: false,
@@ -2252,10 +2342,11 @@
             <span class="card-range">${section.pageRange}</span>
             <h3>${section.title}</h3>
           </div>
-          <span class="metric">${metrics.total + metrics.learningTotal + metrics.memorizationTotal} soru</span>
+          <span class="metric">${metrics.total + metrics.learningTotal + metrics.memorizationTotal} toplam soru</span>
         </div>
-        <p>${section.description}</p>
-        <div class="metric-list">
+        <p class="section-card__description">${section.description}</p>
+        <p class="section-card__guide">Onerilen sira: Ozeti gor, ana testi coz, sonra ogretici ve ezber ile pekistir.</p>
+        <div class="metric-list section-card__stats">
           <span class="metric">${categoryMeta.shortTitle}</span>
           <span class="metric">${metrics.total} ana test</span>
           <span class="metric muted">${metrics.learningTotal} ogretici</span>
@@ -2263,12 +2354,14 @@
           <span class="metric">${metrics.correct} dogru</span>
           <span class="metric muted">${metrics.wrong} yanlis</span>
         </div>
-        <div class="card-bottom">
-          <button class="primary-button" data-open-section="${section.id}">Teste Basla</button>
+        <div class="section-card__actions section-card__actions--primary">
+          <button class="primary-button" data-open-section="${section.id}">Ana Teste Gir</button>
+          <button class="ghost-button" data-open-summary="${section.id}">Ozeti Gor</button>
+        </div>
+        <div class="section-card__actions section-card__actions--secondary">
           ${hasLearningDeck ? `<button class="ghost-button" data-open-learning="${section.id}">Ogretici</button>` : ""}
           ${hasMemorizationDeck ? `<button class="ghost-button" data-open-memorization="${section.id}">Ezber</button>` : ""}
-          <button class="ghost-button" data-open-summary="${section.id}">Ozeti Ac</button>
-          <button class="ghost-button" data-open-wrong="${section.id}">Yanlislar</button>
+          <button class="ghost-button" data-open-wrong="${section.id}">Yanlislarim</button>
         </div>
       </article>
     `;
@@ -3119,6 +3212,8 @@
   elements.wrongOnlyButton.addEventListener("click", () => openStudy(null, "wrong-global"));
   elements.startWrongOnlyButton.addEventListener("click", () => openStudy(null, "wrong-global"));
   elements.startAutoReviewButton.addEventListener("click", startSmartReview);
+  elements.startUfkaStyleExamButton.addEventListener("click", () => startExam("ufkaStyle"));
+  elements.startBookKnowledgeExamButton.addEventListener("click", () => startExam("bookKnowledge"));
   elements.startMiniExamButton.addEventListener("click", () => startExam("mini"));
   elements.startFullExamButton.addEventListener("click", () => startExam("full"));
   elements.exportButton.addEventListener("click", exportCustomQuestions);
